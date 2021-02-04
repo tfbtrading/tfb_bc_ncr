@@ -1,0 +1,28 @@
+{
+  "id": "a3fda467-960f-48fd-ad2c-e388f5b1ce78",
+  "name": "TFB Non Conformance Requests",
+  "publisher": "TFB Trading",
+  "version": "17.0.0.0",
+  "brief": "Handling non-conformance and other quality incidents",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+
+  ],
+  "screenshots": [],
+  "platform": "17.0.0.0",
+  "application": "17.0.0.0",
+  "idRanges": [
+    {
+      "from": 50800,
+      "to": 50900
+    }
+  ],
+  "contextSensitiveHelpUrl": "https://NCR.com/help/",
+  "showMyCode": true,
+  "runtime": "6.0"
+}
