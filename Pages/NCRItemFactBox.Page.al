@@ -15,6 +15,7 @@ page 50804 "TFB NCR Item FactBox"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies date goods were shipped';
+                    Caption = 'Posting Date';
                 }
 
                 field("Order No."; GetOrderNo())
@@ -24,6 +25,7 @@ page 50804 "TFB NCR Item FactBox"
 
                     DrillDown = true;
                     DrillDownPageId = "Sales Order Archives";
+                    Caption = 'Order No.';
 
                     trigger OnDrillDown()
                     var
@@ -32,11 +34,11 @@ page 50804 "TFB NCR Item FactBox"
 
                     begin
 
-                        If not ArchiveLine.IsEmpty() then begin
-                            Archive.SetRange("Document Type", ArchiveLine."Document Type");
-                            Archive.SetRange("No.", ArchiveLine."Document No.");
-                            Archive.SetRange("Version No.", ArchiveLine."Version No.");
-                            Archive.SetRange("Doc. No. Occurrence", ArchiveLine."Doc. No. Occurrence");
+                        If not SalesLineArchive.IsEmpty() then begin
+                            Archive.SetRange("Document Type", SalesLineArchive."Document Type");
+                            Archive.SetRange("No.", SalesLineArchive."Document No.");
+                            Archive.SetRange("Version No.", SalesLineArchive."Version No.");
+                            Archive.SetRange("Doc. No. Occurrence", SalesLineArchive."Doc. No. Occurrence");
 
                             If Archive.FindFirst() then
                                 Page.RUN(Page::"Sales Order Archive", Archive);
@@ -50,6 +52,7 @@ page 50804 "TFB NCR Item FactBox"
                     ToolTip = 'Specifies posted invoice number of of goods';
                     DrillDown = true;
                     DrillDownPageId = "Posted Sales Invoice";
+                    Caption = 'Invoice No.';
 
                     trigger OnDrillDown()
 
@@ -67,17 +70,20 @@ page 50804 "TFB NCR Item FactBox"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies posted quantity of goods sent';
+                    Caption = 'Quantity';
                 }
                 field("Agent Name"; GetAgentName())
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies agent used to ship the goods';
+                    Caption = 'Agent Name';
                 }
                 field("Package Tracking No"; TrackingNo)
 
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies tracking number';
+                    Caption = 'Package Tracking No.';
                 }
 
                 group(Dropship)
@@ -87,12 +93,15 @@ page 50804 "TFB NCR Item FactBox"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies get vendor name';
+                        Caption = 'Vendor Name';
                     }
                     field("Purchase Order No."; GetPurchaseOrderNo())
                     {
                         ApplicationArea = All;
                         DrillDown = true;
                         DrillDownPageId = "Purchase Order Archives";
+                        Caption = 'Purchase Order No.';
+                        ToolTip = 'Specifies the purchase order number';
 
                         trigger OnDrillDown()
                         var
@@ -121,6 +130,7 @@ page 50804 "TFB NCR Item FactBox"
                         ToolTip = 'Specifies Warehouse Reference No';
                         DrillDown = true;
                         DrillDownPageId = "Posted Whse. Shipment";
+                        Caption = 'Warehouse Refence';
 
                         trigger OnDrillDown()
 
@@ -128,12 +138,12 @@ page 50804 "TFB NCR Item FactBox"
                             WhseHeader: Record "Posted Whse. Shipment Header";
 
                         begin
-                            If not WhseLine.IsEmpty() then begin
-                                If WhseHeader.Get(WhseLine."No.") then
+                            If not PostedWhseShipmentLine.IsEmpty() then
+                                If WhseHeader.Get(PostedWhseShipmentLine."No.") then
                                     Page.Run(Page::"Posted Whse. Shipment", WhseHeader);
-                            end;
-
                         end;
+
+
                     }
                 }
 
@@ -146,15 +156,7 @@ page 50804 "TFB NCR Item FactBox"
     {
         area(Processing)
         {
-            action(ActionName)
-            {
-                ApplicationArea = All;
-
-                trigger OnAction()
-                begin
-
-                end;
-            }
+          
         }
     }
 
@@ -162,9 +164,9 @@ page 50804 "TFB NCR Item FactBox"
 
 
     var
+        SalesLineArchive: Record "Sales Line Archive";
+        PostedWhseShipmentLine: Record "Posted Whse. Shipment Line";
         OrderNo: Code[20];
-        ArchiveLine: Record "Sales Line Archive";
-        WhseLine: Record "Posted Whse. Shipment Line";
 
         InvoiceNo: Code[20];
         PurchaseOrderNo: Code[20];
@@ -174,7 +176,7 @@ page 50804 "TFB NCR Item FactBox"
 
         TrackingNo: Text;
 
-        Qty: Decimal;
+       
         Agent: Text;
 
 
@@ -182,41 +184,41 @@ page 50804 "TFB NCR Item FactBox"
 
 
     var
-        ShipmentLine: Record "Sales Shipment Line";
-        Shipment: Record "Sales Shipment Header";
+        SalesShipmentLine: Record "Sales Shipment Line";
+        SalesShipmentHeader: Record "Sales Shipment Header";
 
         ValueEntry: Record "Value Entry";
 
-        Receipt: Record "Purch. Rcpt. Header";
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
 
     begin
         //Get Sales Shipment
 
         If Rec."Document Type" = Rec."Document Type"::"Sales Shipment" then begin
-            ShipmentLine.SetRange("Line No.", Rec."Document Line No.");
-            ShipmentLine.SetRange("Document No.", Rec."Document No.");
-            if ShipmentLine.FindFirst() then begin
+            SalesShipmentLine.SetRange("Line No.", Rec."Document Line No.");
+            SalesShipmentLine.SetRange("Document No.", Rec."Document No.");
+            if SalesShipmentLine.FindFirst() then begin
 
                 //Check archive
-                Shipment.Get(ShipmentLine."Document No.");
-                OrderNo := ShipmentLine."Order No.";
-                PurchaseOrderNo := ShipmentLine."Purchase Order No.";
-                TrackingNo := Shipment."Package Tracking No.";
+                SalesShipmentHeader.Get(SalesShipmentLine."Document No.");
+                OrderNo := SalesShipmentLine."Order No.";
+                PurchaseOrderNo := SalesShipmentLine."Purchase Order No.";
+                TrackingNo := SalesShipmentHeader."Package Tracking No.";
 
-                ArchiveLine.SetRange("Line No.", ShipmentLine."Order Line No.");
-                ArchiveLine.SetRange("Document No.", ShipmentLine."Order No.");
-                ArchiveLine.SetRange("Document Type", ArchiveLine."Document Type"::Order);
-                ArchiveLine.SetRange("Doc. No. Occurrence", 1);
+                SalesLineArchive.SetRange("Line No.", SalesShipmentLine."Order Line No.");
+                SalesLineArchive.SetRange("Document No.", SalesShipmentLine."Order No.");
+                SalesLineArchive.SetRange("Document Type", SalesLineArchive."Document Type"::Order);
+                SalesLineArchive.SetRange("Doc. No. Occurrence", 1);
 
-                If ArchiveLine.FindLast() then
-                    Agent := ArchiveLine."Shipping Agent Code"
+                If SalesLineArchive.FindLast() then
+                    Agent := SalesLineArchive."Shipping Agent Code"
                 else
                     Agent := 'Error no archive';
 
                 If Rec."Drop Shipment" then begin
-                    Receipt.SetRange("Order No.");
-                    If Receipt.FindFirst() then
-                        VendorName := Receipt."Buy-from Vendor Name"
+                    PurchRcptHeader.SetRange("Order No.");
+                    If PurchRcptHeader.FindFirst() then
+                        VendorName := PurchRcptHeader."Buy-from Vendor Name"
                     else
                         VendorName := 'Error no receipt';
                 end
@@ -225,11 +227,11 @@ page 50804 "TFB NCR Item FactBox"
 
 
 
-                    WhseLine.SetRange("Posted Source No.", ShipmentLine."Document No.");
-                    WhseLine.SetRange("Posted Source Document", WhseLine."Posted Source Document"::"Posted Shipment");
+                    PostedWhseShipmentLine.SetRange("Posted Source No.", SalesShipmentLine."Document No.");
+                    PostedWhseShipmentLine.SetRange("Posted Source Document", PostedWhseShipmentLine."Posted Source Document"::"Posted Shipment");
 
-                    If WhseLine.FindFirst() then
-                        WarehouseRef := WhseLine."Whse. Shipment No."
+                    If PostedWhseShipmentLine.FindFirst() then
+                        WarehouseRef := PostedWhseShipmentLine."Whse. Shipment No."
                     else
                         WarehouseRef := '';
                 end;

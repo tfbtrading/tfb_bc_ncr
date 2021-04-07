@@ -24,7 +24,7 @@ pageextension 50807 "TFB NCR Sales Invoice Subform" extends "Posted Sales Invoic
                 trigger OnAction()
 
                 begin
-                    CreateNonConformance(Rec);
+                    AddNewNonConformance(Rec);
                 end;
             }
         }
@@ -34,12 +34,12 @@ pageextension 50807 "TFB NCR Sales Invoice Subform" extends "Posted Sales Invoic
     /// Create a non conformance record related to a particular sales invice
     /// </summary>
     /// <param name="SalesInvoiceLine">Parameter of type Record "Sales Invoice Line".</param>
-    local procedure CreateNonConformance(SalesInvoiceLine: Record "Sales Invoice Line")
+    local procedure AddNewNonConformance(SalesInvoiceLine: Record "Sales Invoice Line")
 
     var
         ValueEntry: Record "Value Entry";
-        ItemLedger: Record "Item Ledger Entry";
-        NCR: Record "TFB Non-Conformance Report";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        TFBNonConformanceReport: Record "TFB Non-Conformance Report";
 
     begin
         ValueEntry.SetRange("Document No.", SalesInvoiceLine."Document No.");
@@ -47,18 +47,18 @@ pageextension 50807 "TFB NCR Sales Invoice Subform" extends "Posted Sales Invoic
         ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
 
         If ValueEntry.FindFirst() then
-            if ItemLedger.Get(ValueEntry."Item Ledger Entry No.") then begin
+            if ItemLedgerEntry.Get(ValueEntry."Item Ledger Entry No.") then begin
 
-                NCR.Init();
-                NCR.Validate("Customer No.", ItemLedger."Source No.");
-                NCR."Date Raised" := Today;
-                NCR.Validate("Item No.", ItemLedger."Item No.");
-                NCR."Order Type" := NCR."Order Type"::Standard;
-                NCR.Validate("Item Ledger Entry No.", ItemLedger."Entry No.");
-                NCR."Non-Conformity Details" := 'Raised directly from sales invoice';
-                NCR.Insert(true);
+                TFBNonConformanceReport.Init();
+                TFBNonConformanceReport.Validate("Customer No.", ItemLedgerEntry."Source No.");
+                TFBNonConformanceReport."Date Raised" := Today;
+                TFBNonConformanceReport.Validate("Item No.", ItemLedgerEntry."Item No.");
+                TFBNonConformanceReport."Order Type" := TFBNonConformanceReport."Order Type"::Standard;
+                TFBNonConformanceReport.Validate("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+                TFBNonConformanceReport."Non-Conformity Details" := 'Raised directly from sales invoice';
+                TFBNonConformanceReport.Insert(true);
 
-                PAGE.Run(PAGE::"TFB Non Conformance Report", NCR);
+                PAGE.Run(PAGE::"TFB Non Conformance Report", TFBNonConformanceReport);
 
             end;
     end;

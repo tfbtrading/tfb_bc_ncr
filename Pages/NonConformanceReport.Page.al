@@ -301,10 +301,137 @@ page 50800 "TFB Non Conformance Report"
     {
         area(Processing)
         {
+            action("TFBSendEmail")
+            {
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Image = SendConfirmation;
+                Caption = 'Send to confirmation to customer';
+                ToolTip = 'Sends confirmation for non-conformance';
+
+                trigger OnAction()
+
+                begin
+                    SendEmail();
+                end;
+            }
 
         }
     }
 
+    local procedure SendEmail()
 
+    var
+        ReportSelections: Record "Report Selections";
+        CompanyInformation: Record "Company Information";
+        DocumentAttachment: record "Document Attachment";
+        Contact: record Contact;
+        Customer: record Customer;
+        Email: CodeUnit Email;
+        EmailMessage: CodeUnit "Email Message";
+
+        TempBlob: CodeUnit "Temp Blob";
+
+        TFBCommonLibrary: CodeUnit "TFB Common Library";
+        RecordRef: RecordRef;
+        OutStream: OutStream;
+        InStream: InStream;
+
+        Dialog: Dialog;
+        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
+        TitleTxt: Label 'Brokerage Shipment Instruction';
+        FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
+        ImageFileNameTxt: Label 'NCR %1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
+        SubTitleTxt: Label '';
+        Recipients: List of [Text];
+        HTMLBuilder: TextBuilder;
+        SubjectNameBuilder: TextBuilder;
+        EmailScenEnum: Enum "Email Scenario";
+
+
+    begin
+
+        If Not Customer.Get(Rec."Customer No.") then
+            Error('No Vendor Record Found');
+
+        If contact.get(Rec."Contact No.") and (contact."E-Mail" <> '') then
+            Recipients.Add(contact."E-Mail")
+        else
+            if Customer."E-Mail" = '' then
+                Error('No Vendor Email Found')
+            else
+                Recipients.Add(Customer."E-Mail");
+
+        CompanyInformation.Get();
+
+        SubjectNameBuilder.Append(StrSubstNo('Non-Conformance Report %1 from TFB Trading', Rec."No."));
+
+
+        Rec.SetRecFilter();
+        RecordRef.GetTable(Rec);
+        TempBlob.CreateOutStream(OutStream);
+
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Non.Conformance.Report");
+        ReportSelections.SetRange("Use for Email Attachment", true);
+        Dialog.Open(Text001Msg);
+        Dialog.Update(1, STRSUBSTNO(Text001Msg, Rec."No."));
+        HTMLBuilder.Append(TFBCommonLibrary.GetHTMLTemplateActive(TitleTxt, SubTitleTxt));
+        If ReportSelections.FindFirst() then
+            If REPORT.SaveAs(ReportSelections."Report ID", '', ReportFormat::Pdf, OutStream, RecordRef) and GenerateBrokerageContent(HTMLBuilder) then begin
+
+
+                EmailMessage.Create(Recipients, SubjectNameBuilder.ToText(), HTMLBuilder.ToText(), true);
+
+                TempBlob.CreateInStream(InStream);
+                EmailMessage.AddAttachment(StrSubstNo(FileNameTxt, Rec."No."), 'application/pdf', InStream);
+
+                DocumentAttachment.SetRange("Table ID", Database::"TFB Non-Conformance Report");
+                DocumentAttachment.SetRange("No.", Rec."No.");
+                DocumentAttachment.SetRange("File Type", DocumentAttachment."File Type"::Image);
+
+                If DocumentAttachment.FindSet(false, false) then
+                    repeat
+                        IF DocumentAttachment."Document Reference ID".HasValue() then begin
+                            clear(TempBlob);
+                            TempBlob.CREATEOUTSTREAM(OutStream);
+                            DocumentAttachment."Document Reference ID".EXPORTSTREAM(OutStream);
+                            If TempBlob.Length() <= (2500 * 1024) then begin
+                                TempBlob.CreateInStream(InStream);
+                                EmailMessage.AddAttachment(StrSubstNo(ImageFileNameTxt, Rec."No.", DocumentAttachment."Line No.", DocumentAttachment."File Extension"), '', InStream);
+                            end
+                        end;
+                    until DocumentAttachment.Next() = 0;
+
+                Email.OpenInEditorModally(EmailMessage, EmailScenEnum::Quality)
+
+
+            end;
+
+    end;
+
+    local procedure GenerateBrokerageContent(var HTMLBuilder: TextBuilder): Boolean
+
+    var
+
+        BodyBuilder: TextBuilder;
+        ReferenceBuilder: TextBuilder;
+
+    begin
+        HTMLBuilder.Replace('%{ExplanationCaption}', 'Notification type');
+        HTMLBuilder.Replace('%{ExplanationValue}', 'Non-Conformance Report');
+        HTMLBuilder.Replace('%{DateCaption}', 'Reported On');
+        HTMLBuilder.Replace('%{DateValue}', Format(Rec."Date Raised", 0, 4));
+        HTMLBuilder.Replace('%{ReferenceCaption}', 'References');
+        ReferenceBuilder.Append(StrSubstNo('Our reference %1', Rec."No."));
+        If Rec."External Reference No." <> '' then
+            ReferenceBuilder.Append(StrSubstNo(' and your ref no. is %1', Rec."External Reference No."));
+        HTMLBuilder.Replace('%{ReferenceValue}', ReferenceBuilder.ToText());
+        HTMLBuilder.Replace('%{AlertText}', '');
+        HTMLBuilder.Replace('%{EmailContent}', BodyBuilder.ToText());
+        Exit(true);
+    end;
 
 }

@@ -15,10 +15,10 @@ table 50801 "TFB Non-Conformance Report"
 
             BEGIN
                 IF "No." <> xRec."No." THEN BEGIN
-                    SalesSetup.GET();
-                    NoSeriesMgt.TestManual(SalesSetup."TFB Non Conf. Report Nos.");
+                    SalesReceivablesSetup.GET();
+                    NoSeriesManagement.TestManual(SalesReceivablesSetup."TFB Non Conf. Report Nos.");
                     "No. Series" := '';
-                    NoSeriesMgt.SetSeries("No.");
+                    NoSeriesManagement.SetSeries("No.");
 
                 END;
             end;
@@ -325,17 +325,17 @@ table 50801 "TFB Non-Conformance Report"
     }
 
     var
-        SalesSetup: Record "Sales & Receivables Setup";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
 
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesManagement: Codeunit NoSeriesManagement;
 
     trigger OnInsert()
     begin
         If "No." = '' then begin
 
-            SalesSetup.Get();
-            SalesSetup.TestField("TFB Non Conf. Report Nos.");
-            NoSeriesMgt.InitSeries(SalesSetup."TFB Non Conf. Report Nos.", Rec."No. Series", 0D, "No.", "No. Series");
+            SalesReceivablesSetup.Get();
+            SalesReceivablesSetup.TestField("TFB Non Conf. Report Nos.");
+            NoSeriesManagement.InitSeries(SalesReceivablesSetup."TFB Non Conf. Report Nos.", Rec."No. Series", 0D, "No.", "No. Series");
         end;
     end;
 }

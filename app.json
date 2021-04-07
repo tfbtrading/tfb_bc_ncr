@@ -2,15 +2,17 @@
   "id": "a3fda467-960f-48fd-ad2c-e388f5b1ce78",
   "name": "TFB Non Conformance Requests",
   "publisher": "TFB Trading",
-  "version": "17.0.0.0",
+  "version": "17.0.1.0",
   "brief": "Handling non-conformance and other quality incidents",
   "description": "",
   "privacyStatement": "",
   "EULA": "",
   "help": "",
-  "url": "",
+  "url": "","suppressWarnings": ["AA0217"],
   "logo": "",
-  "dependencies": [
+  "dependencies": [{"id": "e4b4c5c6-109a-4977-8893-f1502da124f5",
+    "name": "TFB Core Extension",
+    "publisher": "TFB Trading","version": "17.0.9.1"}
 
   ],
   "screenshots": [],

@@ -19,20 +19,20 @@ page 50802 "TFB NCR Attachments"
                 var
                     Recs: Record "Document Attachment";
                 begin
-                    Clear(Page_DocumentAttachment);
+                    Clear(TFBNCRAttachment);
                     Clear(Recs);
                     Recs.Reset();
                     Recs.SetRange("No.", Rec."No.");
                     IF Recs.FindFirst() then;
-                    Page_DocumentAttachment.SetRecord(Recs);
-                    Page_DocumentAttachment.SetTableView(Recs);
-                    Page_DocumentAttachment.RunModal();
-                    Clear(Rec_DocumentAttachment);
+                    TFBNCRAttachment.SetRecord(Recs);
+                    TFBNCRAttachment.SetTableView(Recs);
+                    TFBNCRAttachment.RunModal();
+                    Clear(DocumentAttachment);
                     Clear(_Attachments);
-                    Rec_DocumentAttachment.Reset();
-                    Rec_DocumentAttachment.SetRange("No.", Rec."No.");
-                    IF Rec_DocumentAttachment.FindSet() then
-                        _Attachments := Rec_DocumentAttachment.Count();
+                    DocumentAttachment.Reset();
+                    DocumentAttachment.SetRange("No.", Rec."No.");
+                    IF DocumentAttachment.FindSet() then
+                        _Attachments := DocumentAttachment.Count();
                 end;
             }
 
@@ -41,18 +41,17 @@ page 50802 "TFB NCR Attachments"
 
 
     var
-        Rec_DocumentAttachment: Record "Document Attachment";
-        Page_DocumentAttachment: Page "TFB NCR Attachment";//Change the Page Name Here----OLISTER
+        DocumentAttachment: Record "Document Attachment";
+        TFBNCRAttachment: Page "TFB NCR Attachment";//Change the Page Name Here----OLISTER
         _Attachments: Integer;
 
 
     trigger OnAfterGetRecord()
     begin
         Clear(_Attachments);
-        Clear(Rec_DocumentAttachment);
-        Rec_DocumentAttachment.Reset();
-        Rec_DocumentAttachment.SetRange("No.", Rec."No.");
-        IF Rec_DocumentAttachment.FindSet() then
-            _Attachments := Rec_DocumentAttachment.Count();
+        Clear(DocumentAttachment);
+        DocumentAttachment.Reset();
+        DocumentAttachment.SetRange("No.", Rec."No.");
+        _Attachments := DocumentAttachment.Count();
     end;
 }

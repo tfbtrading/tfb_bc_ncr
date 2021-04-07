@@ -21,6 +21,5 @@ pageextension 50805 "NCR Bus. Mgr. Role Center" extends "Business Manager Role C
         }
     }
 
-    var
-        myInt: Integer;
+    
 }

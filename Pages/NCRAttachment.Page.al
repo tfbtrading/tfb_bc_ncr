@@ -31,13 +31,13 @@ page 50803 "TFB NCR Attachment"
 
 
                     begin
-                        IF Recs.Get(Rec."No.") then;
-                        FromRecRef.GetTable(Recs);
+                        IF TFBNonConformanceReport.Get(Rec."No.") then;
+                        FromRecRef.GetTable(TFBNonConformanceReport);
                         IF Rec."Document Reference ID".HasValue() THEN
                             Export2(TRUE)
                         ELSE BEGIN
                             FileName := FileManagement.BLOBImportWithFilter(TempBlob, ImportTxt, FileName, STRSUBSTNO(FileDialogTxt, FilterTxt), FilterTxt);
-                            SaveAttachment2(FromRecRef, FileName, TempBlob, Recs."No.");
+                            SaveAttachment2(FromRecRef, FileName, TempBlob, TFBNonConformanceReport."No.");
                             CurrPage.UPDATE(FALSE);
                         END;
 
@@ -72,7 +72,7 @@ page 50803 "TFB NCR Attachment"
 
     }
     var
-        Recs: Record "TFB Non-Conformance Report"; //Change the Table Name Here-
+        TFBNonConformanceReport: Record "TFB Non-Conformance Report"; //Change the Table Name Here-
 
 
     /// <summary> 
@@ -84,7 +84,7 @@ page 50803 "TFB NCR Attachment"
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
-        DocumentStream: OutStream;
+        OutStream: OutStream;
         FullFileName: Text;
 
     begin
@@ -96,25 +96,25 @@ page 50803 "TFB NCR Attachment"
             EXIT;
 
         FullFileName := Rec."File Name" + '.' + Rec."File Extension";
-        TempBlob.CREATEOUTSTREAM(DocumentStream);
-        Rec."Document Reference ID".EXPORTSTREAM(DocumentStream);
+        TempBlob.CREATEOUTSTREAM(OutStream);
+        Rec."Document Reference ID".EXPORTSTREAM(OutStream);
         EXIT(FileManagement.BLOBExport(TempBlob, FullFileName, ShowFileDialog));
     end;
 
     /// <summary> 
     /// Save attachment that was selected
     /// </summary>
-    /// <param name="RecRef">Parameter of type RecordRef.</param>
+    /// <param name="RecordRef">Parameter of type RecordRef.</param>
     /// <param name="FileName">Parameter of type Text.</param>
     /// <param name="TempBlob">Parameter of type Codeunit "Temp Blob".</param>
     /// <param name="OpportunityNo">Parameter of type Code[30].</param>
-    procedure SaveAttachment2(RecRef: RecordRef; FileName: Text; TempBlob: Codeunit "Temp Blob"; OpportunityNo: Code[30])
+    procedure SaveAttachment2(RecordRef: RecordRef; FileName: Text; TempBlob: Codeunit "Temp Blob"; OpportunityNo: Code[30])
     var
-        Rec_Attachment: Record "Document Attachment";
-        Rec_Document: Record "Document Attachment";
+        DocumentAttachment: Record "Document Attachment";
+        RecordDocumentRecord: Record "Document Attachment";
         FileManagement: Codeunit "File Management";
         FieldRef: FieldRef;
-        DocStream2: Instream;
+        InStream: Instream;
         IncomingFileName2: Text;
         EmptyFileNameErr: Label 'No content';
         NoDocumentAttachedErr: Label 'No document attached';
@@ -125,32 +125,32 @@ page 50803 "TFB NCR Attachment"
         IF NOT TempBlob.HasValue() THEN
             ERROR(EmptyFileNameErr);
         IncomingFileName2 := FileName;
-        Clear(Rec_Attachment);
-        Rec_Attachment.Reset();
-        Rec_Attachment.Init();
-        Rec_Attachment.VALIDATE("File Extension", FileManagement.GetExtension(IncomingFileName2));
-        Rec_Attachment.VALIDATE("File Name", COPYSTR(FileManagement.GetFileNameWithoutExtension(IncomingFileName2), 1, MAXSTRLEN(Rec."File Name")));
-        Rec_Attachment.Validate("Document Type", Rec."Document Type"::Order);
-        Rec_Attachment.VALIDATE("Table ID", RecRef.NUMBER());
-        Rec_Attachment.Validate("No.", Recs."No.");
-        TempBlob.CREATEINSTREAM(DocStream2);
-        Rec_Attachment."Document Reference ID".IMPORTSTREAM(DocStream2, '', IncomingFileName2);
-        IF NOT Rec_Attachment."Document Reference ID".HasValue() THEN
+        Clear(DocumentAttachment);
+        DocumentAttachment.Reset();
+        DocumentAttachment.Init();
+        DocumentAttachment.VALIDATE("File Extension", FileManagement.GetExtension(IncomingFileName2));
+        DocumentAttachment.VALIDATE("File Name", COPYSTR(FileManagement.GetFileNameWithoutExtension(IncomingFileName2), 1, MAXSTRLEN(Rec."File Name")));
+        DocumentAttachment.Validate("Document Type", Rec."Document Type"::Order);
+        DocumentAttachment.VALIDATE("Table ID", RecordRef.NUMBER());
+        DocumentAttachment.Validate("No.", TFBNonConformanceReport."No.");
+        TempBlob.CREATEINSTREAM(InStream);
+        DocumentAttachment."Document Reference ID".IMPORTSTREAM(InStream, '', IncomingFileName2);
+        IF NOT DocumentAttachment."Document Reference ID".HasValue() THEN
             ERROR(NoDocumentAttachedErr);
-        CASE RecRef.Number() OF
+        CASE RecordRef.Number() OF
             DATABASE::"TFB Non-Conformance Report":
                 BEGIN
-                    FieldRef := RecRef.FIELD(1);
-                    Clear(Rec_Document);
-                    Rec_Document.SetRange("Table ID", RecRef.Number());
-                    Rec_Document.SetRange("No.", Recs."No.");
-                    IF Rec_Document.FindLast() then
-                        Rec_Attachment.Validate("Line No.", Rec_Document."Line No." + 1000)
+                    FieldRef := RecordRef.FIELD(1);
+                    Clear(RecordDocumentRecord);
+                    RecordDocumentRecord.SetRange("Table ID", RecordRef.Number());
+                    RecordDocumentRecord.SetRange("No.", TFBNonConformanceReport."No.");
+                    IF RecordDocumentRecord.FindLast() then
+                        DocumentAttachment.Validate("Line No.", RecordDocumentRecord."Line No." + 1000)
                     else
-                        Rec_Attachment.Validate("Line No.", 1000);
+                        DocumentAttachment.Validate("Line No.", 1000);
                 END;
         END;
-        Rec_Attachment.INSERT(TRUE);
+        DocumentAttachment.INSERT(TRUE);
     end;
 
 

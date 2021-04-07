@@ -20,6 +20,5 @@ pageextension 50806 "NCR Sales Mgr. Role Center" extends "Sales Manager Role Cen
         }
     }
 
-    var
-        myInt: Integer;
+  
 }
