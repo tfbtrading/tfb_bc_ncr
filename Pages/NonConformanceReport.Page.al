@@ -342,10 +342,10 @@ page 50800 "TFB Non Conformance Report"
 
         Dialog: Dialog;
         Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
-        TitleTxt: Label 'Brokerage Shipment Instruction';
+        TitleTxt: Label 'Non Conformance Report';
         FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
         ImageFileNameTxt: Label 'NCR %1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
-        SubTitleTxt: Label '';
+        SubTitleTxt: Label 'Confirmation';
         Recipients: List of [Text];
         HTMLBuilder: TextBuilder;
         SubjectNameBuilder: TextBuilder;
@@ -421,7 +421,7 @@ page 50800 "TFB Non Conformance Report"
 
     begin
         HTMLBuilder.Replace('%{ExplanationCaption}', 'Notification type');
-        HTMLBuilder.Replace('%{ExplanationValue}', 'Non-Conformance Report');
+        HTMLBuilder.Replace('%{ExplanationValue}', 'Confirmation');
         HTMLBuilder.Replace('%{DateCaption}', 'Reported On');
         HTMLBuilder.Replace('%{DateValue}', Format(Rec."Date Raised", 0, 4));
         HTMLBuilder.Replace('%{ReferenceCaption}', 'References');
