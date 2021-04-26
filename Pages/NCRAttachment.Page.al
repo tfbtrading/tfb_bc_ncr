@@ -111,7 +111,7 @@ page 50803 "TFB NCR Attachment"
     procedure SaveAttachment2(RecordRef: RecordRef; FileName: Text; TempBlob: Codeunit "Temp Blob"; OpportunityNo: Code[30])
     var
         DocumentAttachment: Record "Document Attachment";
-        RecordDocumentRecord: Record "Document Attachment";
+        RecDocumentAttachment: Record "Document Attachment";
         FileManagement: Codeunit "File Management";
         FieldRef: FieldRef;
         InStream: Instream;
@@ -141,11 +141,11 @@ page 50803 "TFB NCR Attachment"
             DATABASE::"TFB Non-Conformance Report":
                 BEGIN
                     FieldRef := RecordRef.FIELD(1);
-                    Clear(RecordDocumentRecord);
-                    RecordDocumentRecord.SetRange("Table ID", RecordRef.Number());
-                    RecordDocumentRecord.SetRange("No.", TFBNonConformanceReport."No.");
-                    IF RecordDocumentRecord.FindLast() then
-                        DocumentAttachment.Validate("Line No.", RecordDocumentRecord."Line No." + 1000)
+                    Clear(RecDocumentAttachment);
+                    RecDocumentAttachment.SetRange("Table ID", RecordRef.Number());
+                    RecDocumentAttachment.SetRange("No.", TFBNonConformanceReport."No.");
+                    IF RecDocumentAttachment.FindLast() then
+                        DocumentAttachment.Validate("Line No.", RecDocumentAttachment."Line No." + 1000)
                     else
                         DocumentAttachment.Validate("Line No.", 1000);
                 END;

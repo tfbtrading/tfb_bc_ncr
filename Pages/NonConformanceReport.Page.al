@@ -344,7 +344,7 @@ page 50800 "TFB Non Conformance Report"
         Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
         TitleTxt: Label 'Non Conformance Report';
         FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
-        ImageFileNameTxt: Label 'NCR %1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
+        ImageFileNameTxt: Label '%1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
         SubTitleTxt: Label 'Confirmation';
         Recipients: List of [Text];
         HTMLBuilder: TextBuilder;
