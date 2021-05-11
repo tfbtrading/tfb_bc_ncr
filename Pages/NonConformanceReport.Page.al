@@ -355,13 +355,13 @@ page 50800 "TFB Non Conformance Report"
     begin
 
         If Not Customer.Get(Rec."Customer No.") then
-            Error('No Vendor Record Found');
+            Error('No Customer Record Found');
 
         If contact.get(Rec."Contact No.") and (contact."E-Mail" <> '') then
             Recipients.Add(contact."E-Mail")
         else
             if Customer."E-Mail" = '' then
-                Error('No Vendor Email Found')
+                Error('No Customer Email Found')
             else
                 Recipients.Add(Customer."E-Mail");
 
@@ -405,6 +405,8 @@ page 50800 "TFB Non Conformance Report"
                         end;
                     until DocumentAttachment.Next() = 0;
 
+                Email.AddRelation(EmailMessage,Database::Customer,Customer.SystemId,Enum::"Email Relation Type"::"Related Entity");
+                Email.AddRelation(EmailMessage,Database::"TFB Non-Conformance Report",Rec.SystemId,Enum::"Email Relation Type"::"Primary Source");
                 Email.OpenInEditorModally(EmailMessage, EmailScenEnum::Quality)
 
 
