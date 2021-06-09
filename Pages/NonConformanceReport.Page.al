@@ -315,42 +315,40 @@ page 50800 "TFB Non Conformance Report"
                 trigger OnAction()
 
                 begin
-                    SendEmail();
+                    SendCustomerEmail();
+                end;
+            }
+
+            action("TFBSendVendorEmail")
+            {
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Image = SendConfirmation;
+                Caption = 'Send to notification to vendor';
+                ToolTip = 'Sends notification for non-conformance';
+
+                trigger OnAction()
+
+                begin
+                    SendVendorEmail();
                 end;
             }
 
         }
     }
 
-    local procedure SendEmail()
+    local procedure SendCustomerEmail()
 
     var
-        ReportSelections: Record "Report Selections";
-        CompanyInformation: Record "Company Information";
-        DocumentAttachment: record "Document Attachment";
         Contact: record Contact;
         Customer: record Customer;
-        Email: CodeUnit Email;
-        EmailMessage: CodeUnit "Email Message";
-
-        TempBlob: CodeUnit "Temp Blob";
-
-        TFBCommonLibrary: CodeUnit "TFB Common Library";
-        RecordRef: RecordRef;
-        OutStream: OutStream;
-        InStream: InStream;
-
-        Dialog: Dialog;
-        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
         TitleTxt: Label 'Non Conformance Report';
-        FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
-        ImageFileNameTxt: Label '%1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
         SubTitleTxt: Label 'Confirmation';
         Recipients: List of [Text];
-        HTMLBuilder: TextBuilder;
         SubjectNameBuilder: TextBuilder;
-        EmailScenEnum: Enum "Email Scenario";
-
 
     begin
 
@@ -365,9 +363,77 @@ page 50800 "TFB Non Conformance Report"
             else
                 Recipients.Add(Customer."E-Mail");
 
-        CompanyInformation.Get();
 
         SubjectNameBuilder.Append(StrSubstNo('Non-Conformance Report %1 from TFB Trading', Rec."No."));
+        SendEmail(Recipients, SubjectNameBuilder, TitleTxt, SubTitleTxt, Customer.SystemId, Enum::"Email Relation Type"::"Related Entity");
+
+    end;
+
+    local procedure SendVendorEmail()
+
+    var
+        Contact: record Contact;
+        Vendor: record Vendor;
+        TitleTxt: Label 'Non Conformance Report';
+        SubTitleTxt: Label 'Notification';
+        Recipients: List of [Text];
+        SubjectNameBuilder: TextBuilder;
+
+    begin
+
+        If Not Vendor.Get(Rec."Vendor No.") then
+            Error('No Vendor Record Found');
+
+
+        If contact.get(Vendor."Primary Contact No.") and (contact."E-Mail" <> '') then
+            Recipients.Add(contact."E-Mail")
+        else
+            if Vendor."E-Mail" = '' then
+                Error('No Vendor Email Found')
+            else
+                Recipients.Add(Vendor."E-Mail");
+
+
+        SubjectNameBuilder.Append(StrSubstNo('Non-Conformance Report %1 from TFB Trading', Rec."No."));
+
+        SendEmail(Recipients, SubjectNameBuilder, TitleTxt, SubTitleTxt, Vendor.SystemId, Enum::"Email Relation Type"::"Related Entity");
+
+    end;
+
+    local procedure SendEmail(Recipients: List of [Text]; SubjectNameBuilder: TextBuilder; TitleTxt: Text; SubTitleTxt: Text; EmailRelationID: Guid; EmailRelationType: Enum "Email Relation Type")
+
+    var
+        ReportSelections: Record "Report Selections";
+        CompanyInformation: Record "Company Information";
+        DocumentAttachment: record "Document Attachment";
+
+        Email: CodeUnit Email;
+        EmailMessage: CodeUnit "Email Message";
+
+        TempBlob: CodeUnit "Temp Blob";
+
+        TFBCommonLibrary: CodeUnit "TFB Common Library";
+        RecordRef: RecordRef;
+        OutStream: OutStream;
+        InStream: InStream;
+
+        Dialog: Dialog;
+        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
+
+        FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
+        ImageFileNameTxt: Label '%1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
+
+
+        HTMLBuilder: TextBuilder;
+
+        EmailScenEnum: Enum "Email Scenario";
+
+
+    begin
+
+
+
+        CompanyInformation.Get();
 
 
         Rec.SetRecFilter();
@@ -405,8 +471,8 @@ page 50800 "TFB Non Conformance Report"
                         end;
                     until DocumentAttachment.Next() = 0;
 
-                Email.AddRelation(EmailMessage,Database::Customer,Customer.SystemId,Enum::"Email Relation Type"::"Related Entity");
-                Email.AddRelation(EmailMessage,Database::"TFB Non-Conformance Report",Rec.SystemId,Enum::"Email Relation Type"::"Primary Source");
+                Email.AddRelation(EmailMessage, Database::Customer, EmailRelationID, EmailRelationType);
+                Email.AddRelation(EmailMessage, Database::"TFB Non-Conformance Report", Rec.SystemId, Enum::"Email Relation Type"::"Primary Source");
                 Email.OpenInEditorModally(EmailMessage, EmailScenEnum::Quality)
 
 

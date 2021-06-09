@@ -156,7 +156,7 @@ page 50804 "TFB NCR Item FactBox"
     {
         area(Processing)
         {
-          
+
         }
     }
 
@@ -176,7 +176,7 @@ page 50804 "TFB NCR Item FactBox"
 
         TrackingNo: Text;
 
-       
+
         Agent: Text;
 
 
@@ -216,7 +216,7 @@ page 50804 "TFB NCR Item FactBox"
                     Agent := 'Error no archive';
 
                 If Rec."Drop Shipment" then begin
-                    PurchRcptHeader.SetRange("Order No.");
+                    PurchRcptHeader.SetRange("Order No.", SalesShipmentLine."Purchase Order No.");
                     If PurchRcptHeader.FindFirst() then
                         VendorName := PurchRcptHeader."Buy-from Vendor Name"
                     else
