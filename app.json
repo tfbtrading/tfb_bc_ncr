@@ -2,13 +2,13 @@
   "id": "a3fda467-960f-48fd-ad2c-e388f5b1ce78",
   "name": "TFB Non Conformance Requests",
   "publisher": "TFB Trading",
-  "version": "18.0.2.0",
+  "version": "19.0.0.0",
   "brief": "Handling non-conformance and other quality incidents",
   "description": "",
   "privacyStatement": "",
   "EULA": "",
   "help": "",
-  "url": "","suppressWarnings": ["AA0217"],
+  "url": "","suppressWarnings": ["AA0217","AW0006"],
   "logo": "",
   "dependencies": [{"id": "e4b4c5c6-109a-4977-8893-f1502da124f5",
     "name": "TFB Core Extension",
@@ -16,8 +16,8 @@
 
   ],
   "screenshots": [],
-  "platform": "18.0.0.0",
-  "application": "18.0.0.0",
+  "platform": "19.0.0.0",
+  "application": "19.0.0.0",
   "idRanges": [
     {
       "from": 50800,
@@ -25,6 +25,6 @@
     }
   ],
   "contextSensitiveHelpUrl": "https://NCR.com/help/",
-  "showMyCode": true,
-  "runtime": "7.0"
+ "resourceExposurePolicy": {"allowDebugging": true,"allowDownloadingSource": true,"includeSourceInSymbolFile": true},
+  "runtime": "8.0"
 }

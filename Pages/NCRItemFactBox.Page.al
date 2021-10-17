@@ -9,8 +9,9 @@ page 50804 "TFB NCR Item FactBox"
     {
         area(Content)
         {
-            group(GroupName)
+            group(SalesInfo)
             {
+                Caption = 'Sales Information';
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
@@ -88,6 +89,7 @@ page 50804 "TFB NCR Item FactBox"
 
                 group(Dropship)
                 {
+                    Visible = Rec."Drop Shipment";
                     // Visible = "Drop Shipment";
                     field(Vendor; GetVendorName())
                     {
