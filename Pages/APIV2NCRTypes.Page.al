@@ -17,6 +17,7 @@ page 50808 "TFB APIV2 - NCR Types"
     ModifyAllowed = false;
     Editable = false;
     DataAccessIntent = ReadOnly;
+    SourceTableView = where(Active = const(true));
 
     layout
     {
@@ -25,6 +26,11 @@ page 50808 "TFB APIV2 - NCR Types"
             repeater(GroupName)
             {
 
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'Id';
+                    Editable = false;
+                }
                 field(ncrType; Rec.NCRType)
                 {
                     Caption = 'NCRType';
