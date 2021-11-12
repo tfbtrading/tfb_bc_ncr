@@ -5,8 +5,8 @@ page 50807 "TFB APIV2 - NCRs"
     APIPublisher = 'tfb';
     APIGroup = 'custom';
     APIVersion = 'v2.0';
-    EntityName = 'NonConformance';
-    EntitySetName = 'NonConformances';
+    EntityName = 'nonConformance';
+    EntitySetName = 'nonConformances';
     SourceTable = "TFB Non-Conformance Report";
     DelayedInsert = true;
     ODataKeyFields = "No.";
