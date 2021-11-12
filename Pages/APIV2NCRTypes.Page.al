@@ -8,8 +8,8 @@ page 50808 "TFB APIV2 - NCR Types"
     APIPublisher = 'tfb';
     APIGroup = 'ncr';
     APIVersion = 'v2.0';
-    EntityName = 'NonConformanceType';
-    EntitySetName = 'NonConformanceTypes';
+    EntityName = 'nonConformanceType';
+    EntitySetName = 'nonConformanceTypes';
     SourceTable = "TFB NCR Type Policy";
     DelayedInsert = true;
     InsertAllowed = false;
