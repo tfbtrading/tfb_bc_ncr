@@ -338,6 +338,24 @@ page 50800 "TFB Non Conformance Report"
             }
 
         }
+        area(Navigation)
+        {
+            action("Sent Emails")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Sent Emails';
+                Image = ShowList;
+                ToolTip = 'View a list of emails that you have sent to this customer.';
+                Visible =true;
+
+                trigger OnAction()
+                var
+                    Email: Codeunit Email;
+                begin
+                    Email.OpenSentEmails(Database::"TFB Non-Conformance Report", Rec.SystemId);
+                end;
+            }
+        }
     }
 
     local procedure SendCustomerEmail()
