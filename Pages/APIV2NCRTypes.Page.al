@@ -11,6 +11,7 @@ page 50808 "TFB APIV2 - NCR Types"
     EntityName = 'nonConformanceType';
     EntitySetName = 'nonConformanceTypes';
     SourceTable = "TFB NCR Type Policy";
+    ODataKeyFields = SystemId;
     DelayedInsert = true;
     InsertAllowed = false;
     DeleteAllowed = false;
