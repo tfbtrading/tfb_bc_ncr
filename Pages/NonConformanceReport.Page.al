@@ -346,7 +346,7 @@ page 50800 "TFB Non Conformance Report"
                 Caption = 'Sent Emails';
                 Image = ShowList;
                 ToolTip = 'View a list of emails that you have sent to this customer.';
-                Visible =true;
+                Visible = true;
 
                 trigger OnAction()
                 var
@@ -445,6 +445,7 @@ page 50800 "TFB Non Conformance Report"
         HTMLBuilder: TextBuilder;
 
         EmailScenEnum: Enum "Email Scenario";
+        Base64Convert: CodeUnit "Base64 Convert";
 
 
     begin
@@ -470,7 +471,8 @@ page 50800 "TFB Non Conformance Report"
                 EmailMessage.Create(Recipients, SubjectNameBuilder.ToText(), HTMLBuilder.ToText(), true);
 
                 TempBlob.CreateInStream(InStream);
-                EmailMessage.AddAttachment(StrSubstNo(FileNameTxt, Rec."No."), 'application/pdf', InStream);
+
+                EmailMessage.AddAttachment(StrSubstNo(FileNameTxt, Rec."No."), 'application/pdf', Base64Convert.ToBase64(InStream));
 
                 DocumentAttachment.SetRange("Table ID", Database::"TFB Non-Conformance Report");
                 DocumentAttachment.SetRange("No.", Rec."No.");
@@ -484,7 +486,9 @@ page 50800 "TFB Non Conformance Report"
                             DocumentAttachment."Document Reference ID".EXPORTSTREAM(OutStream);
                             If TempBlob.Length() <= (2500 * 1024) then begin
                                 TempBlob.CreateInStream(InStream);
-                                EmailMessage.AddAttachment(StrSubstNo(ImageFileNameTxt, Rec."No.", DocumentAttachment."Line No.", DocumentAttachment."File Extension"), '', InStream);
+
+                                EmailMessage.AddAttachment(StrSubstNo(ImageFileNameTxt, Rec."No.", DocumentAttachment."Line No.", DocumentAttachment."File Extension"), '', Base64Convert.ToBase64(InStream));
+
                             end
                         end;
                     until DocumentAttachment.Next() = 0;
