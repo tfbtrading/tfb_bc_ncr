@@ -3,7 +3,7 @@ page 50807 "TFB APIV2 - NCRs"
     PageType = API;
     Caption = 'Non Conformance Report';
     APIPublisher = 'tfb';
-    APIGroup = 'custom';
+    APIGroup = 'ncr';
     APIVersion = 'v2.0';
     EntityName = 'nonConformance';
     EntitySetName = 'nonConformances';
@@ -50,6 +50,11 @@ page 50807 "TFB APIV2 - NCRs"
                 {
                     Caption = 'Date Raised';
                 }
+                field(dateClosed; Rec."Date Closed")
+                {
+                    Caption = 'dateClosed';
+                }
+
                 field(dropShipment; Rec."Drop Shipment")
                 {
                     Caption = 'Drop Shipment';
@@ -77,6 +82,7 @@ page 50807 "TFB APIV2 - NCRs"
                 field("type"; Rec."Type")
                 {
                     Caption = 'Type';
+
                 }
                 field(vendorNo; Rec."Vendor No.")
                 {
@@ -85,6 +91,16 @@ page 50807 "TFB APIV2 - NCRs"
                 field(vendorName; Rec."Vendor Name")
                 {
                     Caption = 'Vendor Name';
+                }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'lastModifiedDateTime';
+                }
+
+                part(typeDetail; "TFB APIV2 - NCR Types")
+                {
+                    SubPageLink = NCRType = field(Type);
+                    Multiplicity = ZeroOrOne;
                 }
             }
         }
