@@ -210,12 +210,12 @@ table 50801 "TFB Non-Conformance Report"
         field(86; "Ledger Order No."; Code[20])
         {
             FieldClass = FlowField;
-            CalcFormula = lookup ("Item Ledger Entry"."Order No." where("Entry No." = field("Item Ledger Entry No.")));
+            CalcFormula = lookup("Item Ledger Entry"."Document No." where("Entry No." = field("Item Ledger Entry No.")));
         }
         field(87; "Ledger External Reference No."; Text[100])
         {
             FieldClass = FlowField;
-            CalcFormula = lookup ("Item Ledger Entry"."External Document No." where("Entry No." = field("Item Ledger Entry No.")));
+            CalcFormula = lookup("Item Ledger Entry"."External Document No." where("Entry No." = field("Item Ledger Entry No.")));
         }
         field(89; "Drop Shipment"; Boolean)
         {
@@ -270,7 +270,8 @@ table 50801 "TFB Non-Conformance Report"
                     Status::Complete:
                         begin
                             Closed := true;
-                            "Date Closed" := WorkDate();
+                            If "Date Closed" = 0D then
+                                "Date Closed" := WorkDate();
                         end;
                     else begin
                             Closed := false;
@@ -282,7 +283,7 @@ table 50801 "TFB Non-Conformance Report"
         field(152; "No. of Sales Cr"; Integer)
         {
             FieldClass = FlowField;
-            CalcFormula = count ("Sales Cr.Memo Header" where("TFB NCR No." = field("No.")));
+            CalcFormula = count("Sales Cr.Memo Header" where("TFB NCR No." = field("No.")));
 
         }
         field(160; Closed; Boolean)

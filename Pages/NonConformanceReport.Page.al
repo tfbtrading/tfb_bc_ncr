@@ -27,6 +27,7 @@ page 50800 "TFB Non Conformance Report"
                     Importance = Additional;
                     Editable = Rec."Item Ledger Entry No." = 0;
                     ToolTip = 'Specify customer number';
+
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
@@ -34,6 +35,7 @@ page 50800 "TFB Non Conformance Report"
                     Importance = Promoted;
                     Editable = Rec."Item Ledger Entry No." = 0;
                     ToolTip = 'Specify customer name';
+                    TableRelation = Customer."No." where("No." = field("Customer No."));
                 }
 
                 field("Date Raised"; Rec."Date Raised")
@@ -150,8 +152,9 @@ page 50800 "TFB Non Conformance Report"
                     field("Ledger Order No."; Rec."Ledger Order No.")
                     {
                         ApplicationArea = All;
+                        Caption = 'Ledger Doc No.';
                         Importance = Additional;
-                        ToolTip = 'Specify the order number related to the ledger entry';
+                        ToolTip = 'Specify the document number related to the ledger entry';
                     }
                     field("Ledger External Reference No."; Rec."Ledger External Reference No.")
                     {
@@ -352,7 +355,7 @@ page 50800 "TFB Non Conformance Report"
                 var
                     Email: Codeunit Email;
                 begin
-                    Email.OpenSentEmails(Database::"TFB Non-Conformance Report", Rec.SystemId);
+                    Email.OpenSentEmails(Rec);
                 end;
             }
         }
@@ -383,7 +386,7 @@ page 50800 "TFB Non Conformance Report"
 
 
         SubjectNameBuilder.Append(StrSubstNo('Non-Conformance Report %1 from TFB Trading', Rec."No."));
-        SendEmail(Recipients, SubjectNameBuilder, TitleTxt, SubTitleTxt, Customer.SystemId, Enum::"Email Relation Type"::"Related Entity");
+        SendEmail(Recipients, SubjectNameBuilder, TitleTxt, SubTitleTxt, Customer.SystemId, Database::Customer);
 
     end;
 
@@ -414,11 +417,11 @@ page 50800 "TFB Non Conformance Report"
 
         SubjectNameBuilder.Append(StrSubstNo('Non-Conformance Report %1 from TFB Trading', Rec."No."));
 
-        SendEmail(Recipients, SubjectNameBuilder, TitleTxt, SubTitleTxt, Vendor.SystemId, Enum::"Email Relation Type"::"Related Entity");
+        SendEmail(Recipients, SubjectNameBuilder, TitleTxt, SubTitleTxt, Vendor.SystemId, Database::Vendor);
 
     end;
 
-    local procedure SendEmail(Recipients: List of [Text]; SubjectNameBuilder: TextBuilder; TitleTxt: Text; SubTitleTxt: Text; EmailRelationID: Guid; EmailRelationType: Enum "Email Relation Type")
+    local procedure SendEmail(Recipients: List of [Text]; SubjectNameBuilder: TextBuilder; TitleTxt: Text; SubTitleTxt: Text; EmailRelationID: Guid; EmailRelationTable: Integer)
 
     var
         ReportSelections: Record "Report Selections";
@@ -493,8 +496,8 @@ page 50800 "TFB Non Conformance Report"
                         end;
                     until DocumentAttachment.Next() = 0;
 
-                Email.AddRelation(EmailMessage, Database::Customer, EmailRelationID, EmailRelationType);
-                Email.AddRelation(EmailMessage, Database::"TFB Non-Conformance Report", Rec.SystemId, Enum::"Email Relation Type"::"Primary Source");
+                Email.AddRelation(EmailMessage, EmailRelationTable, EmailRelationID, Enum::"Email Relation Type"::"Related Entity", Enum::"Email Relation Origin"::"Compose Context");
+                Email.AddRelation(EmailMessage, Database::"TFB Non-Conformance Report", Rec.SystemId, Enum::"Email Relation Type"::"Primary Source", Enum::"Email Relation Origin"::"Compose Context");
                 Email.OpenInEditorModally(EmailMessage, EmailScenEnum::Quality)
 
 
