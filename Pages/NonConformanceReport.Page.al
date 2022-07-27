@@ -252,6 +252,13 @@ page 50800 "TFB Non Conformance Report"
                             ToolTip = 'Specifies details on the non-conformance';
                             Editable = Rec.Status = Rec.Status::Reported;
                         }
+                        field(Questions; Rec.Questions)
+                        {
+                            ApplicationArea = All;
+                            MultiLine = true;
+                            ToolTip = 'Specifies what questions should be asked of customer/supplier';
+                            Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
+                        }
 
                         field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
                         {

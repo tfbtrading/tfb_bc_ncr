@@ -246,6 +246,10 @@ table 50801 "TFB Non-Conformance Report"
         {
             DataClassification = CustomerContent;
         }
+        field(122; "Questions"; Text[2048])
+        {
+            DataClassification = CustomerContent;
+        }
         field(125; "Supporting Media"; MediaSet)
         {
             DataClassification = CustomerContent;
