@@ -300,6 +300,13 @@ page 50800 "TFB Non Conformance Report"
                 SubPageLink = "Entry No." = field("Item Ledger Entry No.");
                 Caption = 'Sales Details';
             }
+            part(CustomerDetails; "Sales Hist. Sell-to FactBox")
+            {
+                ApplicationArea = All;
+                SubPageLink = "No." = field("Customer No.");
+                Caption = 'Customer History';
+                Visible = Rec."Customer No." <> '';
+            }
 
         }
 
@@ -328,6 +335,7 @@ page 50800 "TFB Non Conformance Report"
                     SendCustomerEmail();
                 end;
             }
+            
 
             action("TFBSendVendorEmail")
             {
@@ -346,6 +354,8 @@ page 50800 "TFB Non Conformance Report"
                     SendVendorEmail();
                 end;
             }
+
+            
 
         }
         area(Navigation)
