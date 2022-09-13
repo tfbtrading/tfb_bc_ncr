@@ -41,6 +41,10 @@ enum 50800 "TFB NCR Type"
     {
         Caption = 'Order - Incorrect Product';
     }
+    value(16; Address)
+    {
+        Caption = 'Delivered to Wrong Address';
+    }
 
 
 }
