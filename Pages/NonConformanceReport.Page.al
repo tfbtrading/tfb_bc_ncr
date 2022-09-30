@@ -3,8 +3,8 @@ page 50800 "TFB Non Conformance Report"
     PageType = Document;
     Caption = 'Non Conformance Report';
     SourceTable = "TFB Non-Conformance Report";
-    DataCaptionFields = "Customer Name", "No.", Description;
-    DataCaptionExpression = Rec."Customer Name" + ' ' + Rec."No.";
+    DataCaptionFields = "No.", Description;
+    DataCaptionExpression = Rec."No." + ' ' + Rec.Description;
     LinksAllowed = true;
 
     layout
@@ -21,23 +21,53 @@ page 50800 "TFB Non Conformance Report"
                     Editable = false;
                     ToolTip = 'Specify number sequence';
                 }
-                field("Customer No."; Rec."Customer No.")
+                field(Source; Rec.Source)
                 {
-                    ApplicationArea = All;
-                    Importance = Additional;
-                    Editable = Rec."Item Ledger Entry No." = 0;
-                    ToolTip = 'Specify customer number';
 
                 }
-                field("Customer Name"; Rec."Customer Name")
+                group(CustomerGroup)
                 {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    Editable = Rec."Item Ledger Entry No." = 0;
-                    ToolTip = 'Specify customer name';
-                    TableRelation = Customer."No." where("No." = field("Customer No."));
-                }
+                    Visible = Rec.Source = Rec.Source::Customer;
+                    Caption = 'Customer Details';
 
+                    field("Customer No."; Rec."Customer No.")
+                    {
+                        ApplicationArea = All;
+                        Importance = Additional;
+                        Editable = Rec."Item Ledger Entry No." = 0;
+                        ToolTip = 'Specify customer number';
+
+
+                    }
+                    field("Customer Name"; Rec."Customer Name")
+                    {
+                        ApplicationArea = All;
+                        Importance = Promoted;
+                        Editable = Rec."Item Ledger Entry No." = 0;
+                        ToolTip = 'Specify customer name';
+                        TableRelation = Customer."No." where("No." = field("Customer No."));
+                    }
+
+                    field("Contact No."; Rec."Contact No.")
+                    {
+                        ApplicationArea = All;
+                        Importance = Standard;
+                        ToolTip = 'Specify the contact who reported the issue';
+                        Editable = not Rec.Closed;
+                    }
+                    field("Issued By"; Rec."Issued By")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify the name of the contact who reported the issue';
+                        Editable = not Rec.Closed;
+                    }
+                    field("E-mail"; Rec."E-mail")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify the customer email address for correspondence';
+                    }
+
+                }
                 field("Date Raised"; Rec."Date Raised")
                 {
                     ApplicationArea = All;
@@ -59,8 +89,11 @@ page 50800 "TFB Non Conformance Report"
                             if Rec."Date Raised" = 0D then
                                 Rec.FieldError("Date Raised", 'Must enter a date raised');
 
-                            If Rec."Customer No." = '' then
+                            If (Rec."Customer No." = '') and (Rec.Source = Rec.Source::Customer) then
                                 Rec.FieldError("Customer No.", 'Must enter a customer no');
+
+                            If (Rec."Vendor No." = '') and (Rec.Source = Rec.Source::Warehouse) then
+                                Rec.FieldError("Vendor No.", 'Must enter a vendor no');
 
                             if Rec.Status = Rec.Status::Complete then
                                 If Rec."Corrective Action" = '' then
@@ -70,24 +103,6 @@ page 50800 "TFB Non Conformance Report"
                         end;
 
                     end;
-                }
-                field("Contact No."; Rec."Contact No.")
-                {
-                    ApplicationArea = All;
-                    Importance = Standard;
-                    ToolTip = 'Specify the contact who reported the issue';
-                    Editable = not Rec.Closed;
-                }
-                field("Issued By"; Rec."Issued By")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specify the name of the contact who reported the issue';
-                    Editable = not Rec.Closed;
-                }
-                field("E-mail"; Rec."E-mail")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specify the customer email address for correspondence';
                 }
 
                 field("External Reference No."; Rec."External Reference No.")
@@ -127,7 +142,7 @@ page 50800 "TFB Non Conformance Report"
                 field("Item Ledger Entry No."; Rec."Item Ledger Entry No.")
                 {
                     ApplicationArea = All;
-                    Editable = (Rec."Customer No." <> '') and (Rec."Item No." <> '') and (Rec."Order Type" = Rec."Order Type"::Standard) and (not Rec.Closed);
+                    Editable = (((Rec."Customer No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Customer)) or ((Rec."Vendor No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Warehouse))) and (Rec."Order Type" = Rec."Order Type"::Standard) and (not Rec.Closed);
                     ToolTip = 'Specify the ledger entry related to the issue. A ledger entry represents the specific transactions';
 
                     trigger OnValidate()
@@ -335,7 +350,7 @@ page 50800 "TFB Non Conformance Report"
                     SendCustomerEmail();
                 end;
             }
-            
+
 
             action("TFBSendVendorEmail")
             {
@@ -355,7 +370,7 @@ page 50800 "TFB Non Conformance Report"
                 end;
             }
 
-            
+
 
         }
         area(Navigation)

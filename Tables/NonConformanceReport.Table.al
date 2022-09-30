@@ -30,6 +30,15 @@ table 50801 "TFB Non-Conformance Report"
             ValidateTableRelation = true;
 
         }
+        field(3; "Source"; enum "TFB NCR Source")
+        {
+            trigger OnValidate()
+
+            begin
+                If (Status <> Status::Reported) and (Rec.Status <> xRec.Status) then
+                    FieldError(Status, 'Cannot change source if status is beyond reported');
+            end;
+        }
         field(10; "Customer No."; Code[20])
         {
             DataClassification = CustomerContent;
@@ -204,7 +213,9 @@ table 50801 "TFB Non-Conformance Report"
         }
         field(85; "Item Ledger Entry No."; Integer)
         {
-            TableRelation = "Item Ledger Entry" where("Item No." = field("Item No."), "Entry Type" = const(Sale), "Source Type" = const(Customer), "Source No." = field("Customer No."));
+            TableRelation = If (Source = const(Customer)) "Item Ledger Entry" where("Item No." = field("Item No."), "Entry Type" = const(Sale), "Source Type" = const(Customer), "Source No." = field("Customer No."))
+            else
+            if (Source = const(Warehouse)) "Item Ledger Entry" where("Item No." = field("Item No."), "Entry Type" = const(Purchase), "Source Type" = const(Vendor), "Source No." = field("Vendor No."));
             DataClassification = CustomerContent;
         }
         field(86; "Ledger Order No."; Code[20])
@@ -278,9 +289,9 @@ table 50801 "TFB Non-Conformance Report"
                                 "Date Closed" := WorkDate();
                         end;
                     else begin
-                            Closed := false;
-                            "Date Closed" := 0D;
-                        end;
+                        Closed := false;
+                        "Date Closed" := 0D;
+                    end;
                 end;
             end;
         }
@@ -289,6 +300,11 @@ table 50801 "TFB Non-Conformance Report"
             FieldClass = FlowField;
             CalcFormula = count("Sales Cr.Memo Header" where("TFB NCR No." = field("No.")));
 
+        }
+        field(153; "No. of Purchase Cr"; Integer)
+        {
+            FieldClass = FlowField;
+            CalcFormula = count("Purch. Cr. Memo Hdr." where("TFB NCR No." = field("No.")));
         }
         field(160; Closed; Boolean)
         {
@@ -308,6 +324,10 @@ table 50801 "TFB Non-Conformance Report"
             Clustered = true;
         }
         key(Customer; "Customer Name")
+        {
+
+        }
+        key(Vendor; "Vendor Name")
         {
 
         }
