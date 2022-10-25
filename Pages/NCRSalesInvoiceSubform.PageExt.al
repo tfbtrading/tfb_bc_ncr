@@ -14,10 +14,6 @@ pageextension 50807 "TFB NCR Sales Invoice Subform" extends "Posted Sales Invoic
             {
                 ApplicationArea = all;
                 Caption = 'Create Non-Conformance Report';
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
                 Image = CreateDocument;
                 ToolTip = 'Create a new non-conformance report based on this invoice';
 

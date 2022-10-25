@@ -23,7 +23,9 @@ page 50800 "TFB Non Conformance Report"
                 }
                 field(Source; Rec.Source)
                 {
-
+                    ApplicationArea = All;
+                    Caption = 'Source of NCR';
+                    ToolTip = 'Specifies where the NCR originates from';
                 }
                 group(CustomerGroup)
                 {
@@ -333,15 +335,12 @@ page 50800 "TFB Non Conformance Report"
     {
         area(Processing)
         {
-            action("TFBSendEmail")
+            action(EmailCustomer)
             {
                 ApplicationArea = All;
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+
                 Image = SendConfirmation;
-                Caption = 'Send to confirmation to customer';
+                Caption = 'Email Customer';
                 ToolTip = 'Sends confirmation for non-conformance';
 
                 trigger OnAction()
@@ -352,15 +351,12 @@ page 50800 "TFB Non Conformance Report"
             }
 
 
-            action("TFBSendVendorEmail")
+            action(EmailVendor)
             {
                 ApplicationArea = All;
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+
                 Image = SendConfirmation;
-                Caption = 'Send to notification to vendor';
+                Caption = 'Email Vendor';
                 ToolTip = 'Sends notification for non-conformance';
 
                 trigger OnAction()
@@ -375,7 +371,7 @@ page 50800 "TFB Non Conformance Report"
         }
         area(Navigation)
         {
-            action("Sent Emails")
+            action(SentEmails)
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sent Emails';
@@ -391,6 +387,22 @@ page 50800 "TFB Non Conformance Report"
                 end;
             }
         }
+
+        area(Promoted)
+        {
+            actionref(EmailCustomer_Promoted; EmailCustomer)
+            {
+
+            }
+            actionref(EmailVendor_Promoted; EmailVendor)
+            {
+
+            }
+            actionref(SentEmails_Promoted; SentEmails)
+            {
+
+            }
+        }
     }
 
     local procedure SendCustomerEmail()
@@ -398,9 +410,9 @@ page 50800 "TFB Non Conformance Report"
     var
         Contact: record Contact;
         Customer: record Customer;
-        TitleTxt: Label 'Non Conformance Report';
-        SubTitleTxt: Label 'Confirmation';
         Recipients: List of [Text];
+        SubTitleTxt: Label 'Confirmation';
+        TitleTxt: Label 'Non Conformance Report';
         SubjectNameBuilder: TextBuilder;
 
     begin
@@ -427,9 +439,9 @@ page 50800 "TFB Non Conformance Report"
     var
         Contact: record Contact;
         Vendor: record Vendor;
-        TitleTxt: Label 'Non Conformance Report';
-        SubTitleTxt: Label 'Notification';
         Recipients: List of [Text];
+        SubTitleTxt: Label 'Notification';
+        TitleTxt: Label 'Non Conformance Report';
         SubjectNameBuilder: TextBuilder;
 
     begin
@@ -456,32 +468,24 @@ page 50800 "TFB Non Conformance Report"
     local procedure SendEmail(Recipients: List of [Text]; SubjectNameBuilder: TextBuilder; TitleTxt: Text; SubTitleTxt: Text; EmailRelationID: Guid; EmailRelationTable: Integer)
 
     var
-        ReportSelections: Record "Report Selections";
         CompanyInformation: Record "Company Information";
         DocumentAttachment: record "Document Attachment";
-
+        ReportSelections: Record "Report Selections";
         Email: CodeUnit Email;
         EmailMessage: CodeUnit "Email Message";
-
         TempBlob: CodeUnit "Temp Blob";
-
         TFBCommonLibrary: CodeUnit "TFB Common Library";
-        RecordRef: RecordRef;
-        OutStream: OutStream;
-        InStream: InStream;
-
+        Base64Convert: CodeUnit "Base64 Convert";
         Dialog: Dialog;
-        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
-
+        InStream: InStream;
+        OutStream: OutStream;
+        EmailScenEnum: Enum "Email Scenario";
         FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
         ImageFileNameTxt: Label '%1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
-
-
+        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
         HTMLBuilder: TextBuilder;
 
-        EmailScenEnum: Enum "Email Scenario";
-        Base64Convert: CodeUnit "Base64 Convert";
-
+        RecordRef: RecordRef;
 
     begin
 
@@ -540,9 +544,9 @@ page 50800 "TFB Non Conformance Report"
     local procedure GenerateBrokerageContent(var HTMLBuilder: TextBuilder): Boolean
 
     var
-
         BodyBuilder: TextBuilder;
         ReferenceBuilder: TextBuilder;
+
 
     begin
         HTMLBuilder.Replace('%{ExplanationCaption}', 'Notification type');
