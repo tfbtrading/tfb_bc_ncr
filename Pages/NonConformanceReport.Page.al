@@ -253,6 +253,15 @@ page 50800 "TFB Non Conformance Report"
             group(Information)
             {
                 Caption = 'Detailed Information';
+
+                field("Parent NCR No."; Rec."Parent NCR No.")
+                {
+                    DrillDown = true;
+                    ApplicationArea = All;
+                    DrillDownPageId = "TFB Non Conformance Report";
+                    ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
+
+                }
                 grid(DescriptionsGrid)
                 {
                     GridLayout = Rows;

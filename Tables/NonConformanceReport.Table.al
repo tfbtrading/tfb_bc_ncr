@@ -295,6 +295,19 @@ table 50801 "TFB Non-Conformance Report"
                 end;
             end;
         }
+        field(151; "Parent NCR No."; Code[20])
+        {
+            TableRelation = "TFB Non-Conformance Report";
+            ValidateTableRelation = true;
+
+            trigger OnValidate()
+
+            begin
+                if "Parent NCR No." = "No." then
+                    FieldError("Parent NCR No.", 'You cannot select this NCR as a parent');
+            end;
+
+        }
         field(152; "No. of Sales Cr"; Integer)
         {
             FieldClass = FlowField;
