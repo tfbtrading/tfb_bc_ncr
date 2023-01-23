@@ -68,50 +68,86 @@ page 50800 "TFB Non Conformance Report"
                         ApplicationArea = All;
                         ToolTip = 'Specify the customer email address for correspondence';
                     }
+                    field("External Reference No."; Rec."External Reference No.")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify the external reference number if provided by customer';
+                        Editable = not Rec.closed;
+                    }
 
                 }
-                field("Date Raised"; Rec."Date Raised")
+                group(StatusGroup)
                 {
-                    ApplicationArea = All;
-                    Importance = Standard;
-                    ToolTip = 'Specify date report was raised by customer';
-                    Editable = not Rec.Closed;
-                }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specify current status of the report';
-                    Style = Attention;
-                    StyleExpr = Rec.Status <> Rec.Status::Complete;
+                    Caption = 'Status Details';
+                    ShowCaption = true;
+                    field(Status; Rec.Status)
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify current status of the report';
+                        Style = Attention;
+                        StyleExpr = Rec.Status <> Rec.Status::Complete;
 
-                    trigger OnValidate()
+                        trigger OnValidate()
 
-                    begin
-                        If Rec.Status.AsInteger() > Rec.Status::Reported.AsInteger() then begin
-                            if Rec."Date Raised" = 0D then
-                                Rec.FieldError("Date Raised", 'Must enter a date raised');
+                        begin
+                            If Rec.Status.AsInteger() > Rec.Status::Reported.AsInteger() then begin
+                                if Rec."Date Raised" = 0D then
+                                    Rec.FieldError("Date Raised", 'Must enter a date raised');
 
-                            If (Rec."Customer No." = '') and (Rec.Source = Rec.Source::Customer) then
-                                Rec.FieldError("Customer No.", 'Must enter a customer no');
+                                If (Rec."Customer No." = '') and (Rec.Source = Rec.Source::Customer) then
+                                    Rec.FieldError("Customer No.", 'Must enter a customer no');
 
-                            If (Rec."Vendor No." = '') and (Rec.Source = Rec.Source::Warehouse) then
-                                Rec.FieldError("Vendor No.", 'Must enter a vendor no');
+                                If (Rec."Vendor No." = '') and (Rec.Source = Rec.Source::Warehouse) then
+                                    Rec.FieldError("Vendor No.", 'Must enter a vendor no');
 
-                            if Rec.Status = Rec.Status::Complete then
-                                If Rec."Corrective Action" = '' then
-                                    Rec.FieldError("Corrective Action", 'Must enter a corrective action');
+                                if Rec.Status = Rec.Status::Complete then
+                                    If Rec."Corrective Action" = '' then
+                                        Rec.FieldError("Corrective Action", 'Must enter a corrective action');
 
+
+                            end;
 
                         end;
+                    }
 
-                    end;
+                    field("Date Raised"; Rec."Date Raised")
+                    {
+                        ApplicationArea = All;
+                        Importance = Standard;
+                        ToolTip = 'Specify date report was raised by customer';
+                        Editable = not Rec.Closed;
+                    }
+
+                    field("Corrective Action Due"; Rec."Corrective Action Due")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies a date agreed by which corrective action is due';
+                    }
+                    field("Date Closed"; Rec."Date Closed")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the date on which the rpeort was closed';
+                    }
+
+                    field("No. of Sales Cr"; Rec."No. of Sales Cr")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the related sales credit';
+                    }
+
                 }
 
-                field("External Reference No."; Rec."External Reference No.")
+
+
+
+                field("Parent NCR No."; Rec."Parent NCR No.")
                 {
+                    DrillDown = true;
+                    Caption = 'Parent NCR No.';
                     ApplicationArea = All;
-                    ToolTip = 'Specify the external reference number if provided by customer';
-                    Editable = not Rec.closed;
+                    DrillDownPageId = "TFB Non Conformance Report";
+                    ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
+
                 }
                 field("Item No."; Rec."Item No.")
                 {
@@ -165,6 +201,7 @@ page 50800 "TFB Non Conformance Report"
                 group(LedgerDetails)
                 {
                     Caption = 'Ledger Details';
+                    ShowCaption = true;
                     Visible = Rec."Item Ledger Entry No." > 0;
                     field("Ledger Order No."; Rec."Ledger Order No.")
                     {
@@ -232,78 +269,47 @@ page 50800 "TFB Non Conformance Report"
                     Editable = not Rec.closed;
                 }
 
-                field("Corrective Action Due"; Rec."Corrective Action Due")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies a date agreed by which corrective action is due';
-                }
-                field("Date Closed"; Rec."Date Closed")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the date on which the rpeort was closed';
-                }
-
-                field("No. of Sales Cr"; Rec."No. of Sales Cr")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the related sales credit';
-                }
 
             }
             group(Information)
             {
                 Caption = 'Detailed Information';
 
-                field("Parent NCR No."; Rec."Parent NCR No.")
+
+
+
+
+
+                field("Non-Conformity Details"; Rec."Non-Conformity Details")
                 {
-                    DrillDown = true;
                     ApplicationArea = All;
-                    DrillDownPageId = "TFB Non Conformance Report";
-                    ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
+                    MultiLine = true;
+                    ToolTip = 'Specifies details on the non-conformance';
+                    Editable = Rec.Status = Rec.Status::Reported;
+                }
+                field(Questions; Rec.Questions)
+                {
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies what questions should be asked of customer/supplier';
+                    Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
+                }
+
+                field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
+                {
+                    Caption = 'Investigation and Root Cause';
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
+                    Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
 
                 }
-                grid(DescriptionsGrid)
+                field("Corrective Action"; Rec."Corrective Action")
                 {
-                    GridLayout = Rows;
-
-                    group(row1)
-                    {
-                        ShowCaption = false;
-
-
-                        field("Non-Conformity Details"; Rec."Non-Conformity Details")
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies details on the non-conformance';
-                            Editable = Rec.Status = Rec.Status::Reported;
-                        }
-                        field(Questions; Rec.Questions)
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies what questions should be asked of customer/supplier';
-                            Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
-                        }
-
-                        field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
-                        {
-                            Caption = 'Investigation and Root Cause';
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
-                            Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
-
-                        }
-                        field("Corrective Action"; Rec."Corrective Action")
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies the corrective action that has been taken';
-                            Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
-                        }
-
-                    }
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies the corrective action that has been taken';
+                    Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
                 }
 
             }
