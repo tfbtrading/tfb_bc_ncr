@@ -317,11 +317,13 @@ page 50800 "TFB Non Conformance Report"
         }
         area(FactBoxes)
         {
-            part("Attachments"; "TFB NCR Attachments")
+            part("Attached Documents"; "TFB NCR Attachments")
             {
                 ApplicationArea = All;
+                Caption = 'Attachments';
                 SubPageLink = "No." = field("No.");
             }
+
             systempart(notes; Notes)
             {
                 ApplicationArea = All;
