@@ -1,4 +1,4 @@
-pageextension 50809 EXt extends "TFB Sales Admin Activities"
+pageextension 50809 "TFB NCR Sales Admin Activities" extends "TFB Sales Admin Activities"
 {
     layout
     {
@@ -27,6 +27,5 @@ pageextension 50809 EXt extends "TFB Sales Admin Activities"
         // Add changes to page actions here
     }
 
-    var
-        myInt: Integer;
+
 }

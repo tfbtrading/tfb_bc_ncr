@@ -1,8 +1,8 @@
-pageextension 50800 "TFB NCR Sales & Rec. Setup" extends "Sales & Receivables Setup"
+pageextension 50800 "TFB NCR Core Setup" extends "TFB Core Setup"
 {
     layout
     {
-        addafter("Order Nos.")
+        addlast(NumberSeries)
         {
             field("TFB Non Conf. Report Nos."; Rec."TFB Non Conf. Report Nos.")
             {

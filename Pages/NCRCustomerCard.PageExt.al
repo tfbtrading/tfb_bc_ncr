@@ -9,7 +9,7 @@ pageextension 50803 "TFB NCR Customer Card" extends "Customer Card"
     {
         addafter(NewReminder)
         {
-            action(NCR)
+            action(TFBNewNCR)
             {
                 ApplicationArea = All;
                 ToolTip = 'Create a new non conformance report';
@@ -19,8 +19,14 @@ pageextension 50803 "TFB NCR Customer Card" extends "Customer Card"
                 RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
 
-                Promoted = true;
-                PromotedCategory = Category4;
+
+            }
+        }
+
+        addlast(Category_Category4)
+        {
+            actionref(TFBNewNCR_Promoted; TFBNewNCR)
+            {
 
             }
         }

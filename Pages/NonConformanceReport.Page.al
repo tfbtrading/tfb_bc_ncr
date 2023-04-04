@@ -23,7 +23,9 @@ page 50800 "TFB Non Conformance Report"
                 }
                 field(Source; Rec.Source)
                 {
-
+                    ApplicationArea = All;
+                    Caption = 'Source of NCR';
+                    ToolTip = 'Specifies where the NCR originates from';
                 }
                 group(CustomerGroup)
                 {
@@ -66,50 +68,86 @@ page 50800 "TFB Non Conformance Report"
                         ApplicationArea = All;
                         ToolTip = 'Specify the customer email address for correspondence';
                     }
+                    field("External Reference No."; Rec."External Reference No.")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify the external reference number if provided by customer';
+                        Editable = not Rec.closed;
+                    }
 
                 }
-                field("Date Raised"; Rec."Date Raised")
+                group(StatusGroup)
                 {
-                    ApplicationArea = All;
-                    Importance = Standard;
-                    ToolTip = 'Specify date report was raised by customer';
-                    Editable = not Rec.Closed;
-                }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specify current status of the report';
-                    Style = Attention;
-                    StyleExpr = Rec.Status <> Rec.Status::Complete;
+                    Caption = 'Status Details';
+                    ShowCaption = true;
+                    field(Status; Rec.Status)
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specify current status of the report';
+                        Style = Attention;
+                        StyleExpr = Rec.Status <> Rec.Status::Complete;
 
-                    trigger OnValidate()
+                        trigger OnValidate()
 
-                    begin
-                        If Rec.Status.AsInteger() > Rec.Status::Reported.AsInteger() then begin
-                            if Rec."Date Raised" = 0D then
-                                Rec.FieldError("Date Raised", 'Must enter a date raised');
+                        begin
+                            If Rec.Status.AsInteger() > Rec.Status::Reported.AsInteger() then begin
+                                if Rec."Date Raised" = 0D then
+                                    Rec.FieldError("Date Raised", 'Must enter a date raised');
 
-                            If (Rec."Customer No." = '') and (Rec.Source = Rec.Source::Customer) then
-                                Rec.FieldError("Customer No.", 'Must enter a customer no');
+                                If (Rec."Customer No." = '') and (Rec.Source = Rec.Source::Customer) then
+                                    Rec.FieldError("Customer No.", 'Must enter a customer no');
 
-                            If (Rec."Vendor No." = '') and (Rec.Source = Rec.Source::Warehouse) then
-                                Rec.FieldError("Vendor No.", 'Must enter a vendor no');
+                                If (Rec."Vendor No." = '') and (Rec.Source = Rec.Source::Warehouse) then
+                                    Rec.FieldError("Vendor No.", 'Must enter a vendor no');
 
-                            if Rec.Status = Rec.Status::Complete then
-                                If Rec."Corrective Action" = '' then
-                                    Rec.FieldError("Corrective Action", 'Must enter a corrective action');
+                                if Rec.Status = Rec.Status::Complete then
+                                    If Rec."Corrective Action" = '' then
+                                        Rec.FieldError("Corrective Action", 'Must enter a corrective action');
 
+
+                            end;
 
                         end;
+                    }
 
-                    end;
+                    field("Date Raised"; Rec."Date Raised")
+                    {
+                        ApplicationArea = All;
+                        Importance = Standard;
+                        ToolTip = 'Specify date report was raised by customer';
+                        Editable = not Rec.Closed;
+                    }
+
+                    field("Corrective Action Due"; Rec."Corrective Action Due")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies a date agreed by which corrective action is due';
+                    }
+                    field("Date Closed"; Rec."Date Closed")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the date on which the rpeort was closed';
+                    }
+
+                    field("No. of Sales Cr"; Rec."No. of Sales Cr")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the related sales credit';
+                    }
+
                 }
 
-                field("External Reference No."; Rec."External Reference No.")
+
+
+
+                field("Parent NCR No."; Rec."Parent NCR No.")
                 {
+                    DrillDown = true;
+                    Caption = 'Parent NCR No.';
                     ApplicationArea = All;
-                    ToolTip = 'Specify the external reference number if provided by customer';
-                    Editable = not Rec.closed;
+                    DrillDownPageId = "TFB Non Conformance Report";
+                    ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
+
                 }
                 field("Item No."; Rec."Item No.")
                 {
@@ -163,6 +201,7 @@ page 50800 "TFB Non Conformance Report"
                 group(LedgerDetails)
                 {
                     Caption = 'Ledger Details';
+                    ShowCaption = true;
                     Visible = Rec."Item Ledger Entry No." > 0;
                     field("Ledger Order No."; Rec."Ledger Order No.")
                     {
@@ -230,69 +269,47 @@ page 50800 "TFB Non Conformance Report"
                     Editable = not Rec.closed;
                 }
 
-                field("Corrective Action Due"; Rec."Corrective Action Due")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies a date agreed by which corrective action is due';
-                }
-                field("Date Closed"; Rec."Date Closed")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the date on which the rpeort was closed';
-                }
-
-                field("No. of Sales Cr"; Rec."No. of Sales Cr")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the related sales credit';
-                }
 
             }
             group(Information)
             {
                 Caption = 'Detailed Information';
-                grid(DescriptionsGrid)
+
+
+
+
+
+
+                field("Non-Conformity Details"; Rec."Non-Conformity Details")
                 {
-                    GridLayout = Rows;
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies details on the non-conformance';
+                    Editable = Rec.Status = Rec.Status::Reported;
+                }
+                field(Questions; Rec.Questions)
+                {
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies what questions should be asked of customer/supplier';
+                    Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
+                }
 
-                    group(row1)
-                    {
-                        ShowCaption = false;
+                field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
+                {
+                    Caption = 'Investigation and Root Cause';
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
+                    Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
 
-
-                        field("Non-Conformity Details"; Rec."Non-Conformity Details")
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies details on the non-conformance';
-                            Editable = Rec.Status = Rec.Status::Reported;
-                        }
-                        field(Questions; Rec.Questions)
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies what questions should be asked of customer/supplier';
-                            Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
-                        }
-
-                        field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
-                        {
-                            Caption = 'Investigation and Root Cause';
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
-                            Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
-
-                        }
-                        field("Corrective Action"; Rec."Corrective Action")
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            ToolTip = 'Specifies the corrective action that has been taken';
-                            Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
-                        }
-
-                    }
+                }
+                field("Corrective Action"; Rec."Corrective Action")
+                {
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies the corrective action that has been taken';
+                    Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
                 }
 
             }
@@ -300,11 +317,13 @@ page 50800 "TFB Non Conformance Report"
         }
         area(FactBoxes)
         {
-            part("Attachments"; "TFB NCR Attachments")
+            part("Attached Documents"; "TFB NCR Attachments")
             {
                 ApplicationArea = All;
+                Caption = 'Attachments';
                 SubPageLink = "No." = field("No.");
             }
+
             systempart(notes; Notes)
             {
                 ApplicationArea = All;
@@ -333,15 +352,12 @@ page 50800 "TFB Non Conformance Report"
     {
         area(Processing)
         {
-            action("TFBSendEmail")
+            action(EmailCustomer)
             {
                 ApplicationArea = All;
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+
                 Image = SendConfirmation;
-                Caption = 'Send to confirmation to customer';
+                Caption = 'Email Customer';
                 ToolTip = 'Sends confirmation for non-conformance';
 
                 trigger OnAction()
@@ -352,15 +368,12 @@ page 50800 "TFB Non Conformance Report"
             }
 
 
-            action("TFBSendVendorEmail")
+            action(EmailVendor)
             {
                 ApplicationArea = All;
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+
                 Image = SendConfirmation;
-                Caption = 'Send to notification to vendor';
+                Caption = 'Email Vendor';
                 ToolTip = 'Sends notification for non-conformance';
 
                 trigger OnAction()
@@ -375,7 +388,7 @@ page 50800 "TFB Non Conformance Report"
         }
         area(Navigation)
         {
-            action("Sent Emails")
+            action(SentEmails)
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sent Emails';
@@ -391,6 +404,22 @@ page 50800 "TFB Non Conformance Report"
                 end;
             }
         }
+
+        area(Promoted)
+        {
+            actionref(EmailCustomer_Promoted; EmailCustomer)
+            {
+
+            }
+            actionref(EmailVendor_Promoted; EmailVendor)
+            {
+
+            }
+            actionref(SentEmails_Promoted; SentEmails)
+            {
+
+            }
+        }
     }
 
     local procedure SendCustomerEmail()
@@ -398,9 +427,9 @@ page 50800 "TFB Non Conformance Report"
     var
         Contact: record Contact;
         Customer: record Customer;
-        TitleTxt: Label 'Non Conformance Report';
-        SubTitleTxt: Label 'Confirmation';
         Recipients: List of [Text];
+        SubTitleTxt: Label 'Confirmation';
+        TitleTxt: Label 'Non Conformance Report';
         SubjectNameBuilder: TextBuilder;
 
     begin
@@ -427,9 +456,9 @@ page 50800 "TFB Non Conformance Report"
     var
         Contact: record Contact;
         Vendor: record Vendor;
-        TitleTxt: Label 'Non Conformance Report';
-        SubTitleTxt: Label 'Notification';
         Recipients: List of [Text];
+        SubTitleTxt: Label 'Notification';
+        TitleTxt: Label 'Non Conformance Report';
         SubjectNameBuilder: TextBuilder;
 
     begin
@@ -456,32 +485,24 @@ page 50800 "TFB Non Conformance Report"
     local procedure SendEmail(Recipients: List of [Text]; SubjectNameBuilder: TextBuilder; TitleTxt: Text; SubTitleTxt: Text; EmailRelationID: Guid; EmailRelationTable: Integer)
 
     var
-        ReportSelections: Record "Report Selections";
         CompanyInformation: Record "Company Information";
         DocumentAttachment: record "Document Attachment";
-
+        ReportSelections: Record "Report Selections";
         Email: CodeUnit Email;
         EmailMessage: CodeUnit "Email Message";
-
         TempBlob: CodeUnit "Temp Blob";
-
         TFBCommonLibrary: CodeUnit "TFB Common Library";
-        RecordRef: RecordRef;
-        OutStream: OutStream;
-        InStream: InStream;
-
+        Base64Convert: CodeUnit "Base64 Convert";
         Dialog: Dialog;
-        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
-
+        InStream: InStream;
+        OutStream: OutStream;
+        EmailScenEnum: Enum "Email Scenario";
         FileNameTxt: Label 'Non-Conformance Report %1.pdf', comment = '%1=Unique report no.';
         ImageFileNameTxt: Label '%1 Image %2.%3', comment = '%1=Record No. %2=Attachment Line %3=file extension';
-
-
+        Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
         HTMLBuilder: TextBuilder;
 
-        EmailScenEnum: Enum "Email Scenario";
-        Base64Convert: CodeUnit "Base64 Convert";
-
+        RecordRef: RecordRef;
 
     begin
 
@@ -540,9 +561,9 @@ page 50800 "TFB Non Conformance Report"
     local procedure GenerateBrokerageContent(var HTMLBuilder: TextBuilder): Boolean
 
     var
-
         BodyBuilder: TextBuilder;
         ReferenceBuilder: TextBuilder;
+
 
     begin
         HTMLBuilder.Replace('%{ExplanationCaption}', 'Notification type');

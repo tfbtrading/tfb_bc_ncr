@@ -21,6 +21,5 @@ pageextension 50810 "TFB NCR Pstd Sales Cr. Memo" extends "Posted Sales Credit M
         // Add changes to page actions here
     }
 
-    var
-        myInt: Integer;
+
 }

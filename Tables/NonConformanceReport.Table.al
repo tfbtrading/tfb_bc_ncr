@@ -15,8 +15,8 @@ table 50801 "TFB Non-Conformance Report"
 
             BEGIN
                 IF "No." <> xRec."No." THEN BEGIN
-                    SalesReceivablesSetup.GET();
-                    NoSeriesManagement.TestManual(SalesReceivablesSetup."TFB Non Conf. Report Nos.");
+                    CoreSetup.GET();
+                    NoSeriesManagement.TestManual(CoreSetup."TFB Non Conf. Report Nos.");
                     "No. Series" := '';
                     NoSeriesManagement.SetSeries("No.");
 
@@ -295,6 +295,19 @@ table 50801 "TFB Non-Conformance Report"
                 end;
             end;
         }
+        field(151; "Parent NCR No."; Code[20])
+        {
+            TableRelation = "TFB Non-Conformance Report";
+            ValidateTableRelation = true;
+
+            trigger OnValidate()
+
+            begin
+                if "Parent NCR No." = "No." then
+                    FieldError("Parent NCR No.", 'You cannot select this NCR as a parent');
+            end;
+
+        }
         field(152; "No. of Sales Cr"; Integer)
         {
             FieldClass = FlowField;
@@ -350,7 +363,7 @@ table 50801 "TFB Non-Conformance Report"
     }
 
     var
-        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        CoreSetup: Record "TFB Core Setup";
 
         NoSeriesManagement: Codeunit NoSeriesManagement;
 
@@ -358,9 +371,9 @@ table 50801 "TFB Non-Conformance Report"
     begin
         If "No." = '' then begin
 
-            SalesReceivablesSetup.Get();
-            SalesReceivablesSetup.TestField("TFB Non Conf. Report Nos.");
-            NoSeriesManagement.InitSeries(SalesReceivablesSetup."TFB Non Conf. Report Nos.", Rec."No. Series", 0D, "No.", "No. Series");
+            CoreSetup.Get();
+            CoreSetup.TestField("TFB Non Conf. Report Nos.");
+            NoSeriesManagement.InitSeries(CoreSetup."TFB Non Conf. Report Nos.", Rec."No. Series", 0D, "No.", "No. Series");
         end;
     end;
 }

@@ -1,4 +1,4 @@
-tableextension 50800 "TFB NCR Sales & Rec. Setup" extends "Sales & Receivables Setup"
+tableextension 50807 "TFB NCR Core Setup" extends "TFB Core Setup"
 {
     fields
     {
@@ -8,8 +8,7 @@ tableextension 50800 "TFB NCR Sales & Rec. Setup" extends "Sales & Receivables S
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
             ValidateTableRelation = true;
-            ObsoleteReason = 'Replaced by core setup table';
-            ObsoleteState = Pending;
+
         }
 
 
