@@ -8,9 +8,9 @@ codeunit 50801 "TFB NCR Upgrade"
     trigger OnUpgradePerCompany()
     begin
 
-        If CheckIfUpgradeShouldExecute() then begin
+        If CheckIfUpgradeShouldExecute() then
             MigrateSetup();
-        end;
+
         // Code to perform company related table upgrade tasks
     end;
 
@@ -42,15 +42,10 @@ codeunit 50801 "TFB NCR Upgrade"
 
     local procedure MigrateSetup()
     var
-        CoreSetup: Record "TFB Core Setup";
-        SalesSetup: Record "Sales & Receivables Setup";
+
     begin
 
-        CoreSetup.Get();
-        SalesSetup.Get();
-
-        CoreSetup."TFB Non Conf. Report Nos." := SalesSetup."TFB Non Conf. Report Nos.";
-        CoreSetup.Modify(false);
+        //No new migration
 
     end;
 

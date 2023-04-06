@@ -488,11 +488,12 @@ page 50800 "TFB Non Conformance Report"
         CompanyInformation: Record "Company Information";
         DocumentAttachment: record "Document Attachment";
         ReportSelections: Record "Report Selections";
+        Base64Convert: CodeUnit "Base64 Convert";
         Email: CodeUnit Email;
         EmailMessage: CodeUnit "Email Message";
         TempBlob: CodeUnit "Temp Blob";
         TFBCommonLibrary: CodeUnit "TFB Common Library";
-        Base64Convert: CodeUnit "Base64 Convert";
+        RecordRef: RecordRef;
         Dialog: Dialog;
         InStream: InStream;
         OutStream: OutStream;
@@ -502,7 +503,6 @@ page 50800 "TFB Non Conformance Report"
         Text001Msg: Label 'Sending Non Conformance Confirmation:\#1############################', Comment = '%1=Brokerage Shipment Number';
         HTMLBuilder: TextBuilder;
 
-        RecordRef: RecordRef;
 
     begin
 
@@ -534,7 +534,7 @@ page 50800 "TFB Non Conformance Report"
                 DocumentAttachment.SetRange("No.", Rec."No.");
                 DocumentAttachment.SetRange("File Type", DocumentAttachment."File Type"::Image);
 
-                If DocumentAttachment.FindSet(false, false) then
+                If DocumentAttachment.FindSet(false) then
                     repeat
                         IF DocumentAttachment."Document Reference ID".HasValue() then begin
                             clear(TempBlob);
