@@ -274,42 +274,53 @@ page 50800 "TFB Non Conformance Report"
             group(Information)
             {
                 Caption = 'Detailed Information';
-
-
-
-
-
-
-                field("Non-Conformity Details"; Rec."Non-Conformity Details")
+                grid(Test)
                 {
-                    ApplicationArea = All;
-                    MultiLine = true;
-                    ToolTip = 'Specifies details on the non-conformance';
-                    Editable = Rec.Status = Rec.Status::Reported;
-                }
-                field(Questions; Rec.Questions)
-                {
-                    ApplicationArea = All;
-                    MultiLine = true;
-                    ToolTip = 'Specifies what questions should be asked of customer/supplier';
-                    Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
-                }
+                    GridLayout = Columns;
 
-                field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
-                {
-                    Caption = 'Investigation and Root Cause';
-                    ApplicationArea = All;
-                    MultiLine = true;
-                    ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
-                    Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
+                    group(OrigDetails)
+                    {
+                        Caption = 'Details';
+                        field("Non-Conformity Details"; Rec."Non-Conformity Details")
+                        {
+                            ApplicationArea = All;
+                            MultiLine = true;
+                            Width = 300;
+                            ToolTip = 'Specifies details on the non-conformance';
+                            Editable = Rec.Status = Rec.Status::Reported;
+                        }
+                        field(Questions; Rec.Questions)
+                        {
+                            ApplicationArea = All;
+                            MultiLine = true;
+                            Width = 300;
+                            ToolTip = 'Specifies what questions should be asked of customer/supplier';
+                            Editable = (Rec.Status = Rec.Status::Reported) or (Rec.Status = Rec.Status::Assessed);
+                        }
+                    }
+                    group(ProcessDetails)
+                    {
+                        Caption = 'Answers';
+                        field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
+                        {
+                            Caption = 'Investigation and Root Cause';
+                            ApplicationArea = All;
+                            MultiLine = true;
+                            Width = 300;
+                            ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
+                            Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
 
-                }
-                field("Corrective Action"; Rec."Corrective Action")
-                {
-                    ApplicationArea = All;
-                    MultiLine = true;
-                    ToolTip = 'Specifies the corrective action that has been taken';
-                    Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
+                        }
+                        field("Corrective Action"; Rec."Corrective Action")
+                        {
+                            ApplicationArea = All;
+                            MultiLine = true;
+                            Width = 300;
+                            ToolTip = 'Specifies the corrective action that has been taken';
+                            Editable = (Rec.Status = Rec.Status::Assessed) or (Rec.Status = Rec.Status::InProgress);
+                        }
+                    }
+
                 }
 
             }
