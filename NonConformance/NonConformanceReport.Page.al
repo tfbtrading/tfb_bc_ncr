@@ -27,6 +27,7 @@ page 50800 "TFB Non Conformance Report"
 
                     Caption = 'Source of NCR';
                     ToolTip = 'Specifies where the NCR originates from';
+                    Enabled = Rec.Status = Rec.Status::Reported;
                 }
                 group(CustomerGroup)
                 {
@@ -68,6 +69,7 @@ page 50800 "TFB Non Conformance Report"
                     {
 
                         ToolTip = 'Specify the customer email address for correspondence';
+                        Enabled = not (Rec.Status = Rec.Status::Complete);
                     }
                     field("External Reference No."; Rec."External Reference No.")
                     {
@@ -124,138 +126,144 @@ page 50800 "TFB Non Conformance Report"
 
                         ToolTip = 'Specifies a date agreed by which corrective action is due';
                     }
-
-
-                }
-
-
-
-
-                field("Parent NCR No."; Rec."Parent NCR No.")
-                {
-                    DrillDown = true;
-                    Caption = 'Parent NCR No.';
-                    DrillDownPageId = "TFB Non Conformance Report";
-                    ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
-
-                }
-                field("Item No."; Rec."Item No.")
-                {
-                    ToolTip = 'Specify the item for which an issue was reported';
-                    Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.closed);
-
-                }
-                field(Variant; Rec.Variant)
-                {
-                    Importance = Additional;
-                    ToolTip = 'Specify the variant if any for which the issue was reported';
-                    Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.closed);
-                }
-                field(Description; Rec.Description)
-                {
-
-                    Importance = Standard;
-                    ToolTip = 'Specify the description of the item for which the issue was reported';
-                    Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.Closed);
-                }
-                field("Order Type"; Rec."Order Type")
-                {
-
-                    Importance = Promoted;
-                    ToolTip = 'Specify the type of order';
-                    Editable = not Rec.Closed;
-                }
-                field("Item Ledger Entry No."; Rec."Item Ledger Entry No.")
-                {
-
-                    Editable = (((Rec."Customer No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Customer)) or ((Rec."Vendor No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Warehouse))) and (Rec."Order Type" = Rec."Order Type"::Standard) and (not Rec.Closed);
-                    ToolTip = 'Specify the ledger entry related to the issue. A ledger entry represents the specific transactions';
-
-                    trigger OnValidate()
-
-                    var
-                        Entry: Record "Item Ledger Entry";
-
-                    begin
-                        If Entry.Get(Rec."Item Ledger Entry No.") then begin
-                            Rec."Lot No." := Entry."Lot No.";
-                            Rec."Drop Shipment" := Entry."Drop Shipment";
-                        end
-                        else
-                            Rec."Lot No." := '';
-                    end;
-                }
-
-                group(LedgerDetails)
-                {
-                    Caption = 'Ledger Details';
-                    ShowCaption = true;
-                    Visible = Rec."Item Ledger Entry No." > 0;
-                    field("Ledger Order No."; Rec."Ledger Order No.")
+                    field(Type; Rec.Type)
                     {
 
-                        Caption = 'Ledger Doc No.';
-                        Importance = Additional;
-                        ToolTip = 'Specify the document number related to the ledger entry';
+                        ToolTip = 'Specifies the type of report raised';
+                        Editable = not Rec.Closed;
                     }
-                    field("Ledger External Reference No."; Rec."Ledger External Reference No.")
+
+                    field("Vendor No."; Rec."Vendor No.")
                     {
 
                         Importance = Additional;
-                        ToolTip = 'Specify the customers PO ref for their related order';
+                        ToolTip = 'Specifies the vendor that might need to be involved. Could be original product manager or transport company';
+                        Editable = not Rec.closed;
+                    }
+                    field("Vendor Name"; Rec."Vendor Name")
+                    {
+
+                        Importance = Promoted;
+                        ToolTip = 'Specifies the vendor that might need to be involved. Could be original product manager or transport company';
+                        Editable = not Rec.closed;
+                    }
+                    field("Parent NCR No."; Rec."Parent NCR No.")
+                    {
+                        DrillDown = true;
+                        Caption = 'Parent NCR No.';
+                        DrillDownPageId = "TFB Non Conformance Report";
+                        ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
+                        Enabled = not (Rec.Status = Rec.Status::Complete);
+                    }
+
+                }
+
+
+
+
+
+                group(TransactionDetails)
+                {
+                    Caption = 'Transaction Details';
+
+                    field("Item No."; Rec."Item No.")
+                    {
+                        ToolTip = 'Specify the item for which an issue was reported';
+                        Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.closed);
+
+                    }
+                    field(Variant; Rec.Variant)
+                    {
+                        Importance = Additional;
+                        ToolTip = 'Specify the variant if any for which the issue was reported';
+                        Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.closed);
+                    }
+                    field(Description; Rec.Description)
+                    {
+
+                        Importance = Standard;
+                        ToolTip = 'Specify the description of the item for which the issue was reported';
+                        Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.Closed);
+                    }
+                    field("Order Type"; Rec."Order Type")
+                    {
+
+                        Importance = Promoted;
+                        ToolTip = 'Specify the type of order';
+                        Editable = not Rec.Closed;
+                    }
+                    field("Item Ledger Entry No."; Rec."Item Ledger Entry No.")
+                    {
+
+                        Editable = (((Rec."Customer No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Customer)) or ((Rec."Vendor No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Warehouse))) and (Rec."Order Type" = Rec."Order Type"::Standard) and (not Rec.Closed);
+                        ToolTip = 'Specify the ledger entry related to the issue. A ledger entry represents the specific transactions';
+
+                        trigger OnValidate()
+
+                        var
+                            Entry: Record "Item Ledger Entry";
+
+                        begin
+                            If Entry.Get(Rec."Item Ledger Entry No.") then begin
+                                Rec."Lot No." := Entry."Lot No.";
+                                Rec."Drop Shipment" := Entry."Drop Shipment";
+                            end
+                            else
+                                Rec."Lot No." := '';
+                        end;
+                    }
+
+                    group(LedgerDetails)
+                    {
+                        Caption = 'Ledger Details';
+                        ShowCaption = true;
+                        Visible = Rec."Item Ledger Entry No." > 0;
+                        field("Ledger Order No."; Rec."Ledger Order No.")
+                        {
+
+                            Caption = 'Ledger Doc No.';
+                            Importance = Additional;
+                            ToolTip = 'Specify the document number related to the ledger entry';
+                        }
+                        field("Ledger External Reference No."; Rec."Ledger External Reference No.")
+                        {
+
+                            Importance = Additional;
+                            ToolTip = 'Specify the customers PO ref for their related order';
+                        }
+                    }
+                    field("Lot No."; Rec."Lot No.")
+                    {
+
+                        Editable = false;
+                        ToolTip = 'Specify the lot number related to to the ledger entry';
+
+                        DrillDown = true;
+
+                        trigger OnDrillDown()
+
+                        var
+                            LotInfo: Record "Lot No. Information";
+
+                        begin
+
+                            LotInfo.SetRange("Item No.", Rec."Item No.");
+                            LotInfo.SetRange("Lot No.", Rec."Lot No.");
+                            LotInfo.SetRange("Variant Code", Rec.Variant);
+
+                            If LotInfo.FindFirst() then
+                                Page.Run(Page::"Lot No. Information Card", LotInfo);
+
+
+                        end;
+                    }
+                    field("Drop Shipment"; Rec."Drop Shipment")
+                    {
+
+                        ToolTip = 'Indicates if non-conformance was related to drop shipment';
                     }
                 }
-                field("Lot No."; Rec."Lot No.")
-                {
 
-                    Editable = false;
-                    ToolTip = 'Specify the lot number related to to the ledger entry';
-
-                    DrillDown = true;
-
-                    trigger OnDrillDown()
-
-                    var
-                        LotInfo: Record "Lot No. Information";
-
-                    begin
-
-                        LotInfo.SetRange("Item No.", Rec."Item No.");
-                        LotInfo.SetRange("Lot No.", Rec."Lot No.");
-                        LotInfo.SetRange("Variant Code", Rec.Variant);
-
-                        If LotInfo.FindFirst() then
-                            Page.Run(Page::"Lot No. Information Card", LotInfo);
-
-
-                    end;
-                }
-                field("Drop Shipment"; Rec."Drop Shipment")
-                {
-
-                    ToolTip = 'Indicates if non-conformance was related to drop shipment';
-                }
-                field(Type; Rec.Type)
-                {
-
-                    ToolTip = 'Specifies the type of report raised';
-                    Editable = not Rec.Closed;
-                }
-
-                field("Vendor No."; Rec."Vendor No.")
-                {
-
-                    Importance = Additional;
-                    ToolTip = 'Specifies the vendor that might need to be involved. Could be original product manager or transport company';
-                    Editable = not Rec.closed;
-                }
-                field("Vendor Name"; Rec."Vendor Name")
-                {
-
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the vendor that might need to be involved. Could be original product manager or transport company';
-                    Editable = not Rec.closed;
-                }
 
 
             }
@@ -339,6 +347,7 @@ page 50800 "TFB Non Conformance Report"
                     field("Time Spent"; Rec."Time Spent")
                     {
                         ToolTip = 'Indicate in minutes approximately how much time was spent on this NCR';
+                        BlankZero = true;
                     }
                     field("Lesssons Learnt"; Rec."Lesssons Learnt")
                     {
