@@ -319,6 +319,15 @@ table 50801 "TFB Non-Conformance Report"
             FieldClass = FlowField;
             CalcFormula = count("Purch. Cr. Memo Hdr." where("TFB NCR No." = field("No.")));
         }
+        field(155; "Time Spent"; Integer)
+        {
+            Caption = 'Time Spent';
+        }
+        field(156; "Lesssons Learnt"; Text[2048])
+        {
+            Caption = 'Lessons Learnt';
+        }
+
         field(160; Closed; Boolean)
         {
             DataClassification = CustomerContent;

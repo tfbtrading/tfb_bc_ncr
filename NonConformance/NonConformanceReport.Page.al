@@ -6,24 +6,25 @@ page 50800 "TFB Non Conformance Report"
     DataCaptionFields = "No.", Description;
     DataCaptionExpression = Rec."No." + ' ' + Rec.Description;
     LinksAllowed = true;
+    ApplicationArea = All;
 
     layout
     {
         area(Content)
         {
-            group(Reporting)
+            group(General)
             {
 
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     Editable = false;
                     ToolTip = 'Specify number sequence';
                 }
                 field(Source; Rec.Source)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Source of NCR';
                     ToolTip = 'Specifies where the NCR originates from';
                 }
@@ -34,7 +35,7 @@ page 50800 "TFB Non Conformance Report"
 
                     field("Customer No."; Rec."Customer No.")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         Editable = Rec."Item Ledger Entry No." = 0;
                         ToolTip = 'Specify customer number';
@@ -43,7 +44,7 @@ page 50800 "TFB Non Conformance Report"
                     }
                     field("Customer Name"; Rec."Customer Name")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         Editable = Rec."Item Ledger Entry No." = 0;
                         ToolTip = 'Specify customer name';
@@ -52,7 +53,7 @@ page 50800 "TFB Non Conformance Report"
 
                     field("Contact No."; Rec."Contact No.")
                     {
-                        ApplicationArea = All;
+
                         Importance = Standard;
                         ToolTip = 'Specify the contact who reported the issue';
                         Editable = not Rec.Closed;
@@ -65,12 +66,12 @@ page 50800 "TFB Non Conformance Report"
                     }
                     field("E-mail"; Rec."E-mail")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specify the customer email address for correspondence';
                     }
                     field("External Reference No."; Rec."External Reference No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specify the external reference number if provided by customer';
                         Editable = not Rec.closed;
                     }
@@ -82,7 +83,7 @@ page 50800 "TFB Non Conformance Report"
                     ShowCaption = true;
                     field(Status; Rec.Status)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specify current status of the report';
                         Style = Attention;
                         StyleExpr = Rec.Status <> Rec.Status::Complete;
@@ -112,7 +113,7 @@ page 50800 "TFB Non Conformance Report"
 
                     field("Date Raised"; Rec."Date Raised")
                     {
-                        ApplicationArea = All;
+
                         Importance = Standard;
                         ToolTip = 'Specify date report was raised by customer';
                         Editable = not Rec.Closed;
@@ -120,20 +121,10 @@ page 50800 "TFB Non Conformance Report"
 
                     field("Corrective Action Due"; Rec."Corrective Action Due")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies a date agreed by which corrective action is due';
                     }
-                    field("Date Closed"; Rec."Date Closed")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the date on which the rpeort was closed';
-                    }
 
-                    field("No. of Sales Cr"; Rec."No. of Sales Cr")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the related sales credit';
-                    }
 
                 }
 
@@ -144,42 +135,39 @@ page 50800 "TFB Non Conformance Report"
                 {
                     DrillDown = true;
                     Caption = 'Parent NCR No.';
-                    ApplicationArea = All;
                     DrillDownPageId = "TFB Non Conformance Report";
                     ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
 
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
                     ToolTip = 'Specify the item for which an issue was reported';
                     Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.closed);
 
                 }
                 field(Variant; Rec.Variant)
                 {
-                    ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specify the variant if any for which the issue was reported';
                     Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.closed);
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Importance = Standard;
                     ToolTip = 'Specify the description of the item for which the issue was reported';
                     Editable = (Rec."Item Ledger Entry No." = 0) and (not Rec.Closed);
                 }
                 field("Order Type"; Rec."Order Type")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specify the type of order';
                     Editable = not Rec.Closed;
                 }
                 field("Item Ledger Entry No."; Rec."Item Ledger Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = (((Rec."Customer No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Customer)) or ((Rec."Vendor No." <> '') and (Rec."Item No." <> '') and (Rec.Source = Rec.Source::Warehouse))) and (Rec."Order Type" = Rec."Order Type"::Standard) and (not Rec.Closed);
                     ToolTip = 'Specify the ledger entry related to the issue. A ledger entry represents the specific transactions';
 
@@ -205,21 +193,21 @@ page 50800 "TFB Non Conformance Report"
                     Visible = Rec."Item Ledger Entry No." > 0;
                     field("Ledger Order No."; Rec."Ledger Order No.")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Ledger Doc No.';
                         Importance = Additional;
                         ToolTip = 'Specify the document number related to the ledger entry';
                     }
                     field("Ledger External Reference No."; Rec."Ledger External Reference No.")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specify the customers PO ref for their related order';
                     }
                 }
                 field("Lot No."; Rec."Lot No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specify the lot number related to to the ledger entry';
 
@@ -244,26 +232,26 @@ page 50800 "TFB Non Conformance Report"
                 }
                 field("Drop Shipment"; Rec."Drop Shipment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Indicates if non-conformance was related to drop shipment';
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the type of report raised';
                     Editable = not Rec.Closed;
                 }
 
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the vendor that might need to be involved. Could be original product manager or transport company';
                     Editable = not Rec.closed;
                 }
                 field("Vendor Name"; Rec."Vendor Name")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the vendor that might need to be involved. Could be original product manager or transport company';
                     Editable = not Rec.closed;
@@ -283,7 +271,7 @@ page 50800 "TFB Non Conformance Report"
                         Caption = 'Details';
                         field("Non-Conformity Details"; Rec."Non-Conformity Details")
                         {
-                            ApplicationArea = All;
+
                             MultiLine = true;
                             Width = 300;
                             ToolTip = 'Specifies details on the non-conformance';
@@ -291,7 +279,7 @@ page 50800 "TFB Non Conformance Report"
                         }
                         field(Questions; Rec.Questions)
                         {
-                            ApplicationArea = All;
+
                             MultiLine = true;
                             Width = 300;
                             ToolTip = 'Specifies what questions should be asked of customer/supplier';
@@ -304,7 +292,7 @@ page 50800 "TFB Non Conformance Report"
                         field("Invest. and Root Cause"; Rec."Invest. and Root Cause")
                         {
                             Caption = 'Investigation and Root Cause';
-                            ApplicationArea = All;
+
                             MultiLine = true;
                             Width = 300;
                             ToolTip = 'Specifies the detail, if any on investigation and root cause analysis';
@@ -313,7 +301,7 @@ page 50800 "TFB Non Conformance Report"
                         }
                         field("Corrective Action"; Rec."Corrective Action")
                         {
-                            ApplicationArea = All;
+
                             MultiLine = true;
                             Width = 300;
                             ToolTip = 'Specifies the corrective action that has been taken';
@@ -323,6 +311,41 @@ page 50800 "TFB Non Conformance Report"
 
                 }
 
+            }
+            group(Result)
+            {
+                field("Date Closed"; Rec."Date Closed")
+                {
+
+                    ToolTip = 'Specifies the date on which the rpeort was closed';
+                }
+
+                field("No. of Sales Cr"; Rec."No. of Sales Cr")
+                {
+
+                    ToolTip = 'Specifies the related sales credit';
+                }
+                field("No. of Purch Cr"; Rec."No. of Purchase Cr")
+                {
+
+                    ToolTip = 'Specifies the related sales credit';
+                }
+
+                group(Metrics)
+                {
+                    Visible = Rec.status = Rec.status::Complete;
+                    ShowCaption = false;
+                    InstructionalText = 'Details for internal use to help in continuous improvement';
+                    field("Time Spent"; Rec."Time Spent")
+                    {
+                        ToolTip = 'Indicate in minutes approximately how much time was spent on this NCR';
+                    }
+                    field("Lesssons Learnt"; Rec."Lesssons Learnt")
+                    {
+                        ToolTip = 'Indicate any internal lessons learnt about this NCR as part of knowledge capture';
+                        MultiLine = true;
+                    }
+                }
             }
 
         }
