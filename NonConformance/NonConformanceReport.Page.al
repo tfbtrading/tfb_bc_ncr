@@ -27,7 +27,7 @@ page 50800 "TFB Non Conformance Report"
 
                     Caption = 'Source of NCR';
                     ToolTip = 'Specifies where the NCR originates from';
-                    Enabled = Rec.Status = Rec.Status::Reported;
+                    Editable = Rec.Status = Rec.Status::Reported;
                 }
                 group(CustomerGroup)
                 {
@@ -69,7 +69,7 @@ page 50800 "TFB Non Conformance Report"
                     {
 
                         ToolTip = 'Specify the customer email address for correspondence';
-                        Enabled = not (Rec.Status = Rec.Status::Complete);
+                        Editable = not (Rec.Status = Rec.Status::Complete);
                     }
                     field("External Reference No."; Rec."External Reference No.")
                     {
@@ -153,7 +153,7 @@ page 50800 "TFB Non Conformance Report"
                         Caption = 'Parent NCR No.';
                         DrillDownPageId = "TFB Non Conformance Report";
                         ToolTip = 'Indicates that this NCR is a repeat or related to another NCR';
-                        Enabled = not (Rec.Status = Rec.Status::Complete);
+                        Editable = not (Rec.Status = Rec.Status::Complete);
                     }
 
                 }
@@ -346,6 +346,7 @@ page 50800 "TFB Non Conformance Report"
                     InstructionalText = 'Details for internal use to help in continuous improvement';
                     field("Time Spent"; Rec."Time Spent")
                     {
+                        Caption = 'Time Spent (mins)';
                         ToolTip = 'Indicate in minutes approximately how much time was spent on this NCR';
                         BlankZero = true;
                     }
