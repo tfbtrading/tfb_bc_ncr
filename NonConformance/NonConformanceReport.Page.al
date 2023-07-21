@@ -376,7 +376,7 @@ page 50800 "TFB Non Conformance Report"
             {
                 ApplicationArea = All;
                 SubPageLink = "Entry No." = field("Item Ledger Entry No.");
-                Caption = 'Sales Details';
+                Caption = 'Additional Details';
             }
             part(CustomerDetails; "Sales Hist. Sell-to FactBox")
             {

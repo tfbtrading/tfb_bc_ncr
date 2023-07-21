@@ -4,8 +4,10 @@ pageextension 50814 "NCR 0365 Activities" extends "O365 Activities"
     {
         addafter("Ongoing Purchases")
         {
-            group(Quality)
+            cuegroup(Quality)
             {
+                Caption = 'Ongoing Quality Documents';
+
                 field("No. Open NCR"; Rec."No. Open NCR")
                 {
                     ApplicationArea = Suite;
@@ -31,5 +33,5 @@ pageextension 50814 "NCR 0365 Activities" extends "O365 Activities"
         // Add changes to page actions here
     }
 
-  
+
 }

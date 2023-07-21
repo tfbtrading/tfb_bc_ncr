@@ -122,77 +122,78 @@ page 50804 "TFB NCR Item FactBox"
                         end;
                     }
                 }
-                group(Purchase)
-                {
-                    Visible = Rec."Entry Type" = Rec."Entry Type"::Purchase;
-
-
-
-                    field(VendorOrderNo; PurchaseOrderNo)
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies purchase order reference';
-
-                        DrillDown = true;
-                        DrillDownPageId = "Sales Order Archives";
-                        Caption = 'Purchase Order No.';
-
-                        trigger OnDrillDown()
-                        var
-                            Archive: Record "Purchase Header Archive";
-
-
-                        begin
-
-                            Archive.SetRange("Document Type", Archive."Document Type"::Order);
-                            Archive.SetRange("No.", PurchaseOrderNo);
-
-                            If Archive.FindFirst() then
-                                Page.RUN(Page::"Purchase Order Archive", Archive);
-
-                        end;
-
-                    }
-
-                    field(PurchaseQuantity; abs(Rec.Quantity))
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies posted quantity of goods sent';
-                        Caption = 'Quantity';
-                    }
-                }
-
-                group(Warehouse)
-                {
-                    Visible = (Rec."Entry Type" = Rec."Entry Type"::Sale) and (not Rec."Drop Shipment");
-
-                    field("Warehouse Ref"; WarehouseRef)
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies Warehouse Reference No';
-                        DrillDown = true;
-                        DrillDownPageId = "Posted Whse. Shipment";
-                        Caption = 'Warehouse Refence';
-
-                        trigger OnDrillDown()
-
-                        var
-                            WhseHeader: Record "Posted Whse. Shipment Header";
-
-                        begin
-                            If not PostedWhseShipmentLine.IsEmpty() then
-                                If WhseHeader.Get(PostedWhseShipmentLine."No.") then
-                                    Page.Run(Page::"Posted Whse. Shipment", WhseHeader);
-                        end;
-
-
-                    }
-                }
-
-
             }
+            group(Purchase)
+            {
+                Visible = Rec."Entry Type" = Rec."Entry Type"::Purchase;
+
+
+
+                field(VendorOrderNo; PurchaseOrderNo)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies purchase order reference';
+
+                    DrillDown = true;
+                    DrillDownPageId = "Sales Order Archives";
+                    Caption = 'Purchase Order No.';
+
+                    trigger OnDrillDown()
+                    var
+                        Archive: Record "Purchase Header Archive";
+
+
+                    begin
+
+                        Archive.SetRange("Document Type", Archive."Document Type"::Order);
+                        Archive.SetRange("No.", PurchaseOrderNo);
+
+                        If Archive.FindFirst() then
+                            Page.RUN(Page::"Purchase Order Archive", Archive);
+
+                    end;
+
+                }
+
+                field(PurchaseQuantity; abs(Rec.Quantity))
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies posted quantity of goods sent';
+                    Caption = 'Quantity';
+                }
+            }
+
+            group(Warehouse)
+            {
+                Visible = (Rec."Entry Type" = Rec."Entry Type"::Sale) and (not Rec."Drop Shipment");
+
+                field("Warehouse Ref"; WarehouseRef)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies Warehouse Reference No';
+                    DrillDown = true;
+                    DrillDownPageId = "Posted Whse. Shipment";
+                    Caption = 'Warehouse Refence';
+
+                    trigger OnDrillDown()
+
+                    var
+                        WhseHeader: Record "Posted Whse. Shipment Header";
+
+                    begin
+                        If not PostedWhseShipmentLine.IsEmpty() then
+                            If WhseHeader.Get(PostedWhseShipmentLine."No.") then
+                                Page.Run(Page::"Posted Whse. Shipment", WhseHeader);
+                    end;
+
+
+                }
+            }
+
+
         }
     }
+
 
     actions
     {
