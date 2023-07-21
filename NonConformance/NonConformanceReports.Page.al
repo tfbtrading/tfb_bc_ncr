@@ -31,7 +31,12 @@ page 50801 "TFB Non Conformance Reports"
                     ApplicationArea = All;
                     ToolTip = 'Specify the external reference number if provided by customer';
                 }
-                field("Issued By"; Rec."Issued By")
+                field(Type; Rec.Type)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the type of non-conformance';
+                }
+                field("Vendor Name"; Rec."Vendor Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specify the name of the contact who reported the issue';

@@ -19,7 +19,7 @@ pageextension 50814 "NCR 0365 Activities" extends "O365 Activities"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Open NCRs Overdue';
-                    DrillDownPageID = "Lot No. Information List";
+                    DrillDownPageID = "TFB Non Conformance Reports";
                     ToolTip = 'Open Non Conformances past when correct action due indicated';
                 }
             }
