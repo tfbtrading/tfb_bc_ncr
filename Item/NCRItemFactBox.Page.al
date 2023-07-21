@@ -2,27 +2,29 @@ page 50804 "TFB NCR Item FactBox"
 {
     PageType = CardPart;
     SourceTable = "Item Ledger Entry";
-    Caption = 'Sale Details';
+    Caption = 'Ledger Details';
     Extensible = true;
 
     layout
     {
         area(Content)
         {
+            field("Posting Date"; Rec."Posting Date")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies date goods were shipped';
+                Caption = 'Posting Date';
+            }
             group(SalesInfo)
             {
+                Visible = Rec."Entry Type" = Rec."Entry Type"::Sale;
                 Caption = 'Sales Information';
-                field("Posting Date"; Rec."Posting Date")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies date goods were shipped';
-                    Caption = 'Posting Date';
-                }
+
 
                 field("Order No."; GetOrderNo())
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies sales order number of goods';
+                    ToolTip = 'Specifies sales order for goods';
 
                     DrillDown = true;
                     DrillDownPageId = "Sales Order Archives";
@@ -120,11 +122,49 @@ page 50804 "TFB NCR Item FactBox"
                         end;
                     }
                 }
+                group(Purchase)
+                {
+                    Visible = Rec."Entry Type" = Rec."Entry Type"::Purchase;
+
+
+
+                    field(VendorOrderNo; PurchaseOrderNo)
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies purchase order reference';
+
+                        DrillDown = true;
+                        DrillDownPageId = "Sales Order Archives";
+                        Caption = 'Purchase Order No.';
+
+                        trigger OnDrillDown()
+                        var
+                            Archive: Record "Purchase Header Archive";
+
+
+                        begin
+
+                            Archive.SetRange("Document Type", Archive."Document Type"::Order);
+                            Archive.SetRange("No.", PurchaseOrderNo);
+
+                            If Archive.FindFirst() then
+                                Page.RUN(Page::"Purchase Order Archive", Archive);
+
+                        end;
+
+                    }
+
+                    field(PurchaseQuantity; abs(Rec.Quantity))
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies posted quantity of goods sent';
+                        Caption = 'Quantity';
+                    }
+                }
 
                 group(Warehouse)
                 {
-                    //Visible = not "Drop Shipment";
-
+                    Visible = (Rec."Entry Type" = Rec."Entry Type"::Sale) and (not Rec."Drop Shipment");
 
                     field("Warehouse Ref"; WarehouseRef)
                     {
@@ -172,6 +212,7 @@ page 50804 "TFB NCR Item FactBox"
 
         InvoiceNo: Code[20];
         PurchaseOrderNo: Code[20];
+        VendorOrderNo: Code[35];
         VendorName: Text;
 
         WarehouseRef: Code[20];
@@ -188,65 +229,101 @@ page 50804 "TFB NCR Item FactBox"
     var
         SalesShipmentLine: Record "Sales Shipment Line";
         SalesShipmentHeader: Record "Sales Shipment Header";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
 
         ValueEntry: Record "Value Entry";
 
-        PurchRcptHeader: Record "Purch. Rcpt. Header";
+
 
     begin
-        //Get Sales Shipment
-
-        If Rec."Document Type" = Rec."Document Type"::"Sales Shipment" then begin
-            SalesShipmentLine.SetRange("Line No.", Rec."Document Line No.");
-            SalesShipmentLine.SetRange("Document No.", Rec."Document No.");
-            if SalesShipmentLine.FindFirst() then begin
-
-                //Check archive
-                SalesShipmentHeader.Get(SalesShipmentLine."Document No.");
-                OrderNo := SalesShipmentLine."Order No.";
-                PurchaseOrderNo := SalesShipmentLine."Purchase Order No.";
-                TrackingNo := SalesShipmentHeader."Package Tracking No.";
-
-                SalesLineArchive.SetRange("Line No.", SalesShipmentLine."Order Line No.");
-                SalesLineArchive.SetRange("Document No.", SalesShipmentLine."Order No.");
-                SalesLineArchive.SetRange("Document Type", SalesLineArchive."Document Type"::Order);
-                SalesLineArchive.SetRange("Doc. No. Occurrence", 1);
-
-                If SalesLineArchive.FindLast() then
-                    Agent := SalesLineArchive."Shipping Agent Code"
-                else
-                    Agent := 'Error no archive';
-
-                If Rec."Drop Shipment" then begin
-                    PurchRcptHeader.SetRange("Order No.", SalesShipmentLine."Purchase Order No.");
-                    If PurchRcptHeader.FindFirst() then
-                        VendorName := PurchRcptHeader."Buy-from Vendor Name"
-                    else
-                        VendorName := 'Error no receipt';
-                end
-                else begin
-                    VendorName := '';
+        case Rec."Entry Type" of
+            Rec."Entry Type"::Sale:
 
 
+                if Rec."Document Type" = Rec."Document Type"::"Sales Shipment" then begin
 
-                    PostedWhseShipmentLine.SetRange("Posted Source No.", SalesShipmentLine."Document No.");
-                    PostedWhseShipmentLine.SetRange("Posted Source Document", PostedWhseShipmentLine."Posted Source Document"::"Posted Shipment");
+                    SalesShipmentLine.SetRange("Line No.", Rec."Document Line No.");
+                    SalesShipmentLine.SetRange("Document No.", Rec."Document No.");
+                    SalesShipmentLine.SetLoadFields("Document No.", "Order No.", "Purchase Order No.", "Order Line No.");
 
-                    If PostedWhseShipmentLine.FindFirst() then
-                        WarehouseRef := PostedWhseShipmentLine."Whse. Shipment No."
-                    else
-                        WarehouseRef := '';
+                    if SalesShipmentLine.FindFirst() then begin
+
+                        //Check archive
+                        SalesShipmentHeader.SetLoadFields("No.", "Package Tracking No.");
+                        SalesShipmentHeader.Get(SalesShipmentLine."Document No.");
+                        OrderNo := SalesShipmentLine."Order No.";
+                        PurchaseOrderNo := SalesShipmentLine."Purchase Order No.";
+                        TrackingNo := SalesShipmentHeader."Package Tracking No.";
+
+                        SalesLineArchive.SetRange("Line No.", SalesShipmentLine."Order Line No.");
+                        SalesLineArchive.SetRange("Document No.", SalesShipmentLine."Order No.");
+                        SalesLineArchive.SetRange("Document Type", SalesLineArchive."Document Type"::Order);
+                        SalesLineArchive.SetRange("Doc. No. Occurrence", 1);
+
+                        SalesLineArchive.SetLoadFields("Shipping Agent Code");
+                        If SalesLineArchive.FindLast() then
+                            Agent := SalesLineArchive."Shipping Agent Code"
+                        else
+                            Agent := 'Error no archive';
+
+                        If Rec."Drop Shipment" then begin
+                            PurchRcptHeader.SetLoadFields("Buy-from Vendor Name");
+                            PurchRcptHeader.SetRange("Order No.", SalesShipmentLine."Purchase Order No.");
+                            If PurchRcptHeader.FindFirst() then
+                                VendorName := PurchRcptHeader."Buy-from Vendor Name"
+                            else
+                                VendorName := 'Error no receipt';
+                        end
+                        else begin
+                            VendorName := '';
+
+                            PostedWhseShipmentLine.SetRange("Posted Source No.", SalesShipmentLine."Document No.");
+                            PostedWhseShipmentLine.SetRange("Posted Source Document", PostedWhseShipmentLine."Posted Source Document"::"Posted Shipment");
+                            PostedWhseShipmentLine.SetLoadFields("Whse. Shipment No.");
+                            If PostedWhseShipmentLine.FindFirst() then
+                                WarehouseRef := PostedWhseShipmentLine."Whse. Shipment No."
+                            else
+                                WarehouseRef := '';
+                        end;
+
+                        ValueEntry.SetRange("Item Ledger Entry No.", Rec."Entry No.");
+                        ValueEntry.SetFilter("Invoiced Quantity", '<>0');
+                        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
+                        ValueEntry.SetLoadFields("Document No.");
+
+                        If ValueEntry.FindFirst() then
+                            InvoiceNo := ValueEntry."Document No."
+                        else
+                            InvoiceNo := '';
+
+                    end;
+
                 end;
 
-                ValueEntry.SetRange("Item Ledger Entry No.", Rec."Entry No.");
-                ValueEntry.SetFilter("Item Ledger Entry Quantity", '<>0');
-                ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
+            Rec."Entry Type"::Purchase:
 
-                If ValueEntry.FindFirst() then
-                    InvoiceNo := ValueEntry."Document No.";
+                if Rec."Document Type" = Rec."Document Type"::"Purchase Receipt" then begin
 
-            end;
+                    PurchRcptLine.SetRange("Line No.", Rec."Document Line No.");
+                    PurchRcptLine.SetRange("Document No.", Rec."Document No.");
+                    PurchRcptLine.SetLoadFields("Document No.", "Order Line No.");
+
+                    PurchRcptHeader.SetLoadFields("Vendor Order No.", "Order No.", "Buy-from Vendor Name");
+
+                    If PurchRcptLine.FindFirst() then begin
+                        PurchRcptHeader.Get(PurchRcptLine."Document No.");
+                        PurchaseOrderNo := PurchRcptHeader."Order No.";
+                        VendorOrderNo := PurchRcptHeader."Vendor Order No.";
+                        VendorName := PurchRcptHeader."Buy-from Vendor Name";
+                    end;
+
+                end;
+
+
+
         end;
+
 
     end;
 

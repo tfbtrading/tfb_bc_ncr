@@ -29,8 +29,8 @@ pageextension 50812 "TFB NCR Purch. Invoice Subform" extends "Posted Purch. Invo
     /// <summary> 
     /// Create a non conformance record related to a particular sales invice
     /// </summary>
-    /// <param name="PurchInvoiceLine">Parameter of type Record "Sales Invoice Line".</param>
-    local procedure AddNewNonConformance(PurchInvoiceLine: Record "Purch. Inv. Line")
+    /// <param name="PurchInvLine">Parameter of type Record "Sales Invoice Line".</param>
+    local procedure AddNewNonConformance(PurchInvLine: Record "Purch. Inv. Line")
 
     var
         ValueEntry: Record "Value Entry";
@@ -38,8 +38,8 @@ pageextension 50812 "TFB NCR Purch. Invoice Subform" extends "Posted Purch. Invo
         TFBNonConformanceReport: Record "TFB Non-Conformance Report";
 
     begin
-        ValueEntry.SetRange("Document No.", PurchInvoiceLine."Document No.");
-        ValueEntry.SetRange("Document Line No.", PurchInvoiceLine."Line No.");
+        ValueEntry.SetRange("Document No.", PurchInvLine."Document No.");
+        ValueEntry.SetRange("Document Line No.", PurchInvLine."Line No.");
         ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Purchase Invoice");
 
         If ValueEntry.FindFirst() then
