@@ -46,6 +46,7 @@ pageextension 50812 "TFB NCR Purch. Invoice Subform" extends "Posted Purch. Invo
             if ItemLedgerEntry.Get(ValueEntry."Item Ledger Entry No.") then begin
 
                 TFBNonConformanceReport.Init();
+                TFBNonConformanceReport.Validate(Source,TFBNonConformanceReport.Source::Warehouse);
                 TFBNonConformanceReport.Validate("Vendor No.", ItemLedgerEntry."Source No.");
                 TFBNonConformanceReport."Date Raised" := Today;
                 TFBNonConformanceReport.Validate("Item No.", ItemLedgerEntry."Item No.");
